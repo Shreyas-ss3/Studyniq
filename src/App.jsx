@@ -50,9 +50,13 @@ function Dashboard({ user }) {
 
   useEffect(() => {
     let timer;
+
     if (active && time > 0) {
-      timer = setInterval(() => setTime(t => t - 1), 1000);
+      timer = setInterval(() => {
+        setTime((t) => t - 1);
+      }, 1000);
     }
+
     return () => clearInterval(timer);
   }, [active, time]);
 
@@ -66,32 +70,57 @@ function Dashboard({ user }) {
     const m = Math.floor(t / 60);
     const s = t % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
-  };
+  }; // Fixed: Removed the duplicate closing bracket that was right below this.
 
   const upgrade = async () => {
-    const res = await fetch("fetch("https://focusforge-backend-ixod.onrender.com/")", {
-      method: "POST",
-    });
+    console.log("UPGRADE CLICKED");
 
-    const data = await res.json();
-    window.location.href = data.url;
+    try {
+      const res = await fetch(
+        "https://focusforge-backend-ixod.onrender.com/create-checkout-session",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Stripe session failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Payment error");
+    }
   };
 
   return (
     <div className="app">
       <div className="topbar">
         <h2>FocusForge</h2>
-        <p>{user.email}</p>
+        <p>{user?.email}</p>
       </div>
 
       <div className="grid">
         <div className="card">
           <h3>Tasks</h3>
-          <input value={task} onChange={(e) => setTask(e.target.value)} />
+          <input
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            placeholder="Add task"
+          />
           <button onClick={addTask}>Add</button>
 
           {tasks.map((t, i) => (
-            <div key={i} className="task">{t}</div>
+            <div key={i} className="task">
+              {t}
+            </div>
           ))}
         </div>
 
@@ -105,8 +134,8 @@ function Dashboard({ user }) {
 
         <div className="card">
           <h3>Premium</h3>
-          <p>{isPremium ? "Active" : "Free"}</p>
-          <button onClick={upgrade}>Upgrade £2.99</button>
+          <p>{isPremium ? "Active" : "Free Plan"}</p>
+          <button onClick={upgrade}>Upgrade £2.99/month</button>
         </div>
       </div>
     </div>

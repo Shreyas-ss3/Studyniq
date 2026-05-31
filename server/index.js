@@ -32,8 +32,8 @@ app.post("/create-checkout-session", async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: "http://localhost:5173",
-      cancel_url: "http://localhost:5173",
+      success_url: "https://focusforgestudy.vercel.app/",
+      cancel_url: "https://focusforgestudy.vercel.app/",
     });
 
     res.json({ url: session.url });
@@ -43,6 +43,8 @@ app.post("/create-checkout-session", async (req, res) => {
   }
 });
 
-app.listen(4242, () => {
-  console.log("Stripe server running on http://localhost:4242");
+const PORT = process.env.PORT || 4242;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
