@@ -1,3 +1,7 @@
+app.get("/", (req, res) => {
+  res.send("FocusForge Backend Running");
+});
+
 import dotenv from "dotenv";
 import path from "path";
 import express from "express";
