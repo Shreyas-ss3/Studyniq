@@ -1,7 +1,3 @@
-app.get("/", (req, res) => {
-  res.send("FocusForge Backend Running");
-});
-
 import dotenv from "dotenv";
 import path from "path";
 import express from "express";
@@ -18,8 +14,14 @@ console.log("STRIPE KEY =", process.env.STRIPE_SECRET_KEY);
 
 // Express app
 const app = express();
+
 app.use(cors());
 app.use(express.json());
+
+// Root route (for testing Render)
+app.get("/", (req, res) => {
+  res.send("FocusForge Backend Running");
+});
 
 // Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -42,8 +44,10 @@ app.post("/create-checkout-session", async (req, res) => {
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    console.error("Stripe Error:", error);
+    res.status(500).json({
+      error: error.message,
+    });
   }
 });
 
