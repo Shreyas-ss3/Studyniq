@@ -1,21 +1,44 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import "./App.css";
 
+/* ---------------- HOME (ANIMATED LANDING PAGE) ---------------- */
 function Home() {
   const nav = useNavigate();
 
   return (
-    <div className="center">
-      <div className="card">
-        <h1>Studyniq</h1>
-        <p>Study smarter. Stay focused. Achieve top grades.</p>
-        <button onClick={() => nav("/login")}>Get Started</button>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+
+      {/* glow background */}
+      <div className="absolute w-[500px] h-[500px] bg-pink-400 blur-[120px] opacity-30 rounded-full"></div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-2xl p-10 text-center text-white w-[350px]"
+      >
+        <h1 className="text-5xl font-bold mb-4">Studyniq</h1>
+
+        <p className="text-white/80 mb-6">
+          Study smarter. Stay focused. Achieve top grades.
+        </p>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => nav("/login")}
+          className="bg-white text-black px-6 py-2 rounded-xl font-semibold"
+        >
+          Get Started
+        </motion.button>
+      </motion.div>
     </div>
   );
 }
 
+/* ---------------- LOGIN ---------------- */
 function Login({ setUser }) {
   const [email, setEmail] = useState("");
   const nav = useNavigate();
@@ -27,36 +50,40 @@ function Login({ setUser }) {
   };
 
   return (
-    <div className="center">
-      <div className="card">
-        <h2>Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+      <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-6 rounded-2xl w-[300px]">
+        <h2 className="text-2xl mb-4">Login</h2>
+
         <input
+          className="w-full p-2 mb-3 rounded bg-white/10 border border-white/20"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <button onClick={login}>Login</button>
+
+        <button
+          onClick={login}
+          className="w-full bg-white text-black py-2 rounded"
+        >
+          Login
+        </button>
       </div>
     </div>
   );
 }
 
+/* ---------------- DASHBOARD ---------------- */
 function Dashboard({ user }) {
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState("");
   const [time, setTime] = useState(1500);
   const [active, setActive] = useState(false);
-  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     let timer;
-
     if (active && time > 0) {
-      timer = setInterval(() => {
-        setTime((t) => t - 1);
-      }, 1000);
+      timer = setInterval(() => setTime((t) => t - 1), 1000);
     }
-
     return () => clearInterval(timer);
   }, [active, time]);
 
@@ -70,78 +97,71 @@ function Dashboard({ user }) {
     const m = Math.floor(t / 60);
     const s = t % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
-  }; // Fixed: Removed the duplicate closing bracket that was right below this.
-
-  const upgrade = async () => {
-    console.log("UPGRADE CLICKED");
-
-    try {
-      const res = await fetch(
-        "https://focusforge-backend-ixod.onrender.com/create-checkout-session",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await res.json();
-      console.log(data);
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert("Stripe session failed");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Payment error");
-    }
   };
 
   return (
-    <div className="app">
-      <div className="topbar">
-        <h2>Studyniq</h2>
-        <p>{user?.email}</p>
+    <div className="min-h-screen bg-slate-900 text-white p-6">
+
+      <div className="flex justify-between mb-6">
+        <h2 className="text-2xl font-bold">Studyniq</h2>
+        <p className="text-white/60">{user?.email}</p>
       </div>
 
-      <div className="grid">
-        <div className="card">
-          <h3>Tasks</h3>
+      <div className="grid md:grid-cols-3 gap-6">
+
+        {/* TASKS */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4">
+          <h3 className="mb-3">Tasks</h3>
+
           <input
+            className="w-full p-2 mb-2 bg-white/10 border border-white/20 rounded"
             value={task}
             onChange={(e) => setTask(e.target.value)}
-            placeholder="Add task"
           />
-          <button onClick={addTask}>Add</button>
+
+          <button onClick={addTask} className="bg-white text-black px-3 py-1 rounded">
+            Add
+          </button>
 
           {tasks.map((t, i) => (
-            <div key={i} className="task">
+            <div key={i} className="mt-2 bg-white/10 p-2 rounded">
               {t}
             </div>
           ))}
         </div>
 
-        <div className="card">
+        {/* TIMER */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
           <h3>Pomodoro</h3>
-          <h1>{formatTime(time)}</h1>
-          <button onClick={() => setActive(true)}>Start</button>
-          <button onClick={() => setActive(false)}>Pause</button>
-          <button onClick={() => setTime(1500)}>Reset</button>
+          <h1 className="text-4xl my-4">{formatTime(time)}</h1>
+
+          <button onClick={() => setActive(true)} className="bg-green-500 px-2 py-1 rounded m-1">
+            Start
+          </button>
+          <button onClick={() => setActive(false)} className="bg-yellow-500 px-2 py-1 rounded m-1">
+            Pause
+          </button>
+          <button onClick={() => setTime(1500)} className="bg-red-500 px-2 py-1 rounded m-1">
+            Reset
+          </button>
         </div>
 
-        <div className="card">
+        {/* PREMIUM */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4">
           <h3>Premium</h3>
-          <p>{isPremium ? "Active" : "Free Plan"}</p>
-          <button onClick={upgrade}>Upgrade £2.99/month</button>
+          <p className="text-white/60 mb-3">Free Plan</p>
+
+          <button className="bg-gradient-to-r from-pink-500 to-purple-500 px-3 py-2 rounded">
+            Upgrade £2.99/month
+          </button>
         </div>
+
       </div>
     </div>
   );
 }
 
+/* ---------------- APP ROUTES ---------------- */
 export default function App() {
   const [user, setUser] = useState(null);
 
