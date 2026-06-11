@@ -8,8 +8,8 @@ function Home() {
   return (
     <div className="center">
       <div className="card">
-        <h1>FocusForge</h1>
-        <p>Study smarter. Stay focused.</p>
+        <h1>Studyniq</h1>
+        <p>Study smarter. Stay focused. Achieve top grades.</p>
         <button onClick={() => nav("/login")}>Get Started</button>
       </div>
     </div>
@@ -103,7 +103,7 @@ function Dashboard({ user }) {
   return (
     <div className="app">
       <div className="topbar">
-        <h2>FocusForge</h2>
+        <h2>Studyniq</h2>
         <p>{user?.email}</p>
       </div>
 
