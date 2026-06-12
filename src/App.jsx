@@ -62,13 +62,19 @@ function Login() {
   };
 
   const signup = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      nav("/app");
-    } catch (err) {
-      alert(err.message);
-    }
-  };
+  try {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+
+    console.log("✅ SIGNUP SUCCESS:", res.user);
+
+    nav("/app");
+  } catch (err) {
+    console.error("❌ SIGNUP ERROR CODE:", err.code);
+    console.error("❌ SIGNUP ERROR MESSAGE:", err.message);
+
+    alert(err.message);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
