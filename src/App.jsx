@@ -1,16 +1,24 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+
+import { auth } from "./firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+
 import "./App.css";
 
-/* ---------------- HOME (ANIMATED LANDING PAGE) ---------------- */
+/* ---------------- HOME ---------------- */
 function Home() {
   const nav = useNavigate();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
 
-      {/* glow background */}
       <div className="absolute w-[500px] h-[500px] bg-pink-400 blur-[120px] opacity-30 rounded-full"></div>
 
       <motion.div
@@ -39,20 +47,33 @@ function Home() {
 }
 
 /* ---------------- LOGIN ---------------- */
-function Login({ setUser }) {
+function Login() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const nav = useNavigate();
 
-  const login = () => {
-    if (!email) return;
-    setUser({ email });
-    nav("/app");
+  const login = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      nav("/app");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const signup = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      nav("/app");
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
       <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-6 rounded-2xl w-[300px]">
-        <h2 className="text-2xl mb-4">Login</h2>
+        <h2 className="text-2xl mb-4">Studyniq</h2>
 
         <input
           className="w-full p-2 mb-3 rounded bg-white/10 border border-white/20"
@@ -61,11 +82,20 @@ function Login({ setUser }) {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <button
-          onClick={login}
-          className="w-full bg-white text-black py-2 rounded"
-        >
+        <input
+          className="w-full p-2 mb-3 rounded bg-white/10 border border-white/20"
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button onClick={login} className="w-full bg-white text-black py-2 rounded mb-2">
           Login
+        </button>
+
+        <button onClick={signup} className="w-full bg-purple-500 py-2 rounded">
+          Sign Up
         </button>
       </div>
     </div>
@@ -78,6 +108,10 @@ function Dashboard({ user }) {
   const [task, setTask] = useState("");
   const [time, setTime] = useState(1500);
   const [active, setActive] = useState(false);
+
+  const logout = async () => {
+    await signOut(auth);
+  };
 
   useEffect(() => {
     let timer;
@@ -104,7 +138,13 @@ function Dashboard({ user }) {
 
       <div className="flex justify-between mb-6">
         <h2 className="text-2xl font-bold">Studyniq</h2>
-        <p className="text-white/60">{user?.email}</p>
+
+        <div className="flex gap-4 items-center">
+          <p className="text-white/60">{user?.email}</p>
+          <button onClick={logout} className="bg-red-500 px-3 py-1 rounded">
+            Logout
+          </button>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -165,10 +205,18 @@ function Dashboard({ user }) {
 export default function App() {
   const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+
+    return () => unsub();
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login setUser={setUser} />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/app" element={<Dashboard user={user} />} />
     </Routes>
   );
