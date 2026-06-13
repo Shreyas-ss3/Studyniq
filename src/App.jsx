@@ -37,7 +37,7 @@ function Home() {
 
         <button
           onClick={() => nav("/login")}
-          className="bg-white text-black px-6 py-2 rounded-xl font-semibold hover:scale-105 transition"
+          className="bg-white text-black px-6 py-2 rounded-xl font-semibold"
         >
           Get Started
         </button>
@@ -110,10 +110,7 @@ function Login() {
           Sign Up
         </button>
 
-        <button
-          onClick={googleLogin}
-          className="w-full bg-red-500 py-2 rounded"
-        >
+        <button onClick={googleLogin} className="w-full bg-red-500 py-2 rounded">
           Continue with Google
         </button>
 
@@ -144,18 +141,24 @@ function Dashboard({ user }) {
   }, [active, time]);
 
   const addTask = () => {
-    if (!task) return;
-    setTasks([...tasks, task]);
+    if (!task.trim()) return;
+
+    const newTask = {
+      id: Date.now(),
+      text: task,
+    };
+
+    setTasks((prev) => [...prev, newTask]);
     setTask("");
   };
 
+  const deleteTask = (id) => {
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+  };
+
   const logout = async () => {
-    try {
-      await signOut(auth);
-      nav("/login");
-    } catch (err) {
-      alert(err.message);
-    }
+    await signOut(auth);
+    nav("/login");
   };
 
   const formatTime = (t) => {
@@ -181,8 +184,9 @@ function Dashboard({ user }) {
 
       <div className="grid md:grid-cols-3 gap-6">
 
+        {/* TASKS */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4">
-          <h3>Tasks</h3>
+          <h3 className="mb-3">Tasks</h3>
 
           <input
             className="w-full p-2 mb-2 bg-white/10 border border-white/20 rounded"
@@ -194,13 +198,20 @@ function Dashboard({ user }) {
             Add
           </button>
 
-          {tasks.map((t, i) => (
-            <div key={i} className="mt-2 bg-white/10 p-2 rounded">
-              {t}
+          {tasks.map((t) => (
+            <div
+              key={t.id}
+              className="mt-2 bg-white/10 p-2 rounded flex justify-between"
+            >
+              <span>{t.text}</span>
+              <button onClick={() => deleteTask(t.id)} className="text-red-400">
+                ✕
+              </button>
             </div>
           ))}
         </div>
 
+        {/* TIMER */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
           <h3>Pomodoro</h3>
           <h1 className="text-4xl my-4">{formatTime(time)}</h1>
@@ -216,6 +227,7 @@ function Dashboard({ user }) {
           </button>
         </div>
 
+        {/* PREMIUM */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4">
           <h3>Premium</h3>
           <p className="text-white/60 mb-3">Free Plan</p>
@@ -246,10 +258,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/app"
-        element={user ? <Dashboard user={user} /> : <Login />}
-      />
+      <Route path="/app" element={user ? <Dashboard user={user} /> : <Login />} />
     </Routes>
   );
 }
