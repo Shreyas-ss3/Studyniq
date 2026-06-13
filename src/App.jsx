@@ -14,37 +14,39 @@ import {
 import "./App.css";
 
 /* ---------------- HOME ---------------- */
+/* ---------------- HOME ---------------- */
 function Home() {
   const nav = useNavigate();
-  const [firstVisit, setFirstVisit] = useState(false);
 
   useEffect(() => {
-    const seen = localStorage.getItem("studyniq_seen");
-    setFirstVisit(!seen);
-  }, []);
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        nav("/app");
+      }
+    });
 
-  const handleStart = () => {
-    localStorage.setItem("studyniq_seen", "true");
-    nav("/login");
-  };
+    return () => unsub();
+  }, [nav]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
       <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-2xl p-10 text-center text-white w-[350px]">
-        <h1 className="text-5xl font-bold mb-4">Studyniq</h1>
+
+        <h1 className="text-5xl font-bold mb-4">
+          Studyniq
+        </h1>
 
         <p className="text-white/80 mb-6">
           Study smarter. Stay focused. Achieve top grades.
         </p>
 
-        {firstVisit && (
-          <button
-            onClick={handleStart}
-            className="bg-white text-black px-6 py-2 rounded-xl font-semibold"
-          >
-            Get Started
-          </button>
-        )}
+        <button
+          onClick={() => nav("/login")}
+          className="bg-white text-black px-6 py-2 rounded-xl font-semibold hover:scale-105 transition"
+        >
+          Get Started
+        </button>
+
       </div>
     </div>
   );
