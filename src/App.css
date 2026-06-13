@@ -1,10 +1,12 @@
+/* RESET */
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   background: #0f172a;
   color: white;
 }
 
+/* LAYOUT HELPERS (ONLY ONES YOU ACTUALLY USE) */
 .center {
   height: 100vh;
   display: flex;
@@ -12,40 +14,26 @@ body {
   align-items: center;
 }
 
-.app {
-  padding: 20px;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-  background: #111827;
-  border-radius: 10px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-top: 20px;
-}
-
+/* CARDS */
 .card {
-  background: #1f2937;
-  padding: 15px;
+  background: rgba(30, 41, 59, 0.9);
+  padding: 20px;
   border-radius: 12px;
 }
 
+/* INPUTS */
 input {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
+  border-radius: 6px;
+  border: none;
 }
 
+/* BUTTONS */
 button {
   padding: 10px;
-  margin-right: 5px;
+  margin-top: 10px;
   cursor: pointer;
   background: #3b82f6;
   border: none;
@@ -53,48 +41,14 @@ button {
   border-radius: 6px;
 }
 
+button:hover {
+  opacity: 0.9;
+}
+
+/* TASKS */
 .task {
   background: #111827;
   padding: 8px;
   margin-top: 5px;
   border-radius: 6px;
-}
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-}
-
-.center {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.card {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
-  padding: 20px;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  padding: 20px;
-  background: #111827;
-}
-
-button {
-  padding: 10px;
-  margin-top: 10px;
-  cursor: pointer;
 }
