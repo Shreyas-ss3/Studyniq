@@ -15,33 +15,39 @@ import "./App.css";
 /* ---------------- HOME ---------------- */
 function Home() {
   const nav = useNavigate();
+  const [firstVisit, setFirstVisit] = useState(false);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("studyniq_seen");
+    setFirstVisit(!seen);
+  }, []);
+
+  const handleStart = () => {
+    localStorage.setItem("studyniq_seen", "true");
+    nav("/login");
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
 
-      <div className="absolute w-[500px] h-[500px] bg-pink-400 blur-[120px] opacity-30 rounded-full"></div>
+      <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-2xl p-10 text-center text-white w-[350px]">
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6 }}
-        className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-2xl p-10 text-center text-white w-[350px]"
-      >
         <h1 className="text-5xl font-bold mb-4">Studyniq</h1>
 
         <p className="text-white/80 mb-6">
           Study smarter. Stay focused. Achieve top grades.
         </p>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => nav("/login")}
-          className="bg-white text-black px-6 py-2 rounded-xl font-semibold"
-        >
-          Get Started
-        </motion.button>
-      </motion.div>
+        {firstVisit && (
+          <button
+            onClick={handleStart}
+            className="bg-white text-black px-6 py-2 rounded-xl font-semibold"
+          >
+            Get Started
+          </button>
+        )}
+
+      </div>
     </div>
   );
 }
