@@ -14,15 +14,12 @@ import {
 import "./App.css";
 
 /* ---------------- HOME ---------------- */
-/* ---------------- HOME ---------------- */
 function Home() {
   const nav = useNavigate();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        nav("/app");
-      }
+      if (user) nav("/app");
     });
 
     return () => unsub();
@@ -32,9 +29,7 @@ function Home() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
       <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-2xl p-10 text-center text-white w-[350px]">
 
-        <h1 className="text-5xl font-bold mb-4">
-          Studyniq
-        </h1>
+        <h1 className="text-5xl font-bold mb-4">Studyniq</h1>
 
         <p className="text-white/80 mb-6">
           Study smarter. Stay focused. Achieve top grades.
@@ -138,7 +133,7 @@ function Dashboard({ user }) {
 
   useEffect(() => {
     if (!user) nav("/login");
-  }, [user]);
+  }, [user, nav]);
 
   useEffect(() => {
     let timer;
@@ -154,12 +149,6 @@ function Dashboard({ user }) {
     setTask("");
   };
 
-  const formatTime = (t) => {
-    const m = Math.floor(t / 60);
-    const s = t % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  };
-
   const logout = async () => {
     try {
       await signOut(auth);
@@ -167,6 +156,12 @@ function Dashboard({ user }) {
     } catch (err) {
       alert(err.message);
     }
+  };
+
+  const formatTime = (t) => {
+    const m = Math.floor(t / 60);
+    const s = t % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -186,9 +181,8 @@ function Dashboard({ user }) {
 
       <div className="grid md:grid-cols-3 gap-6">
 
-        {/* TASKS */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4">
-          <h3 className="mb-3">Tasks</h3>
+          <h3>Tasks</h3>
 
           <input
             className="w-full p-2 mb-2 bg-white/10 border border-white/20 rounded"
@@ -207,7 +201,6 @@ function Dashboard({ user }) {
           ))}
         </div>
 
-        {/* TIMER */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
           <h3>Pomodoro</h3>
           <h1 className="text-4xl my-4">{formatTime(time)}</h1>
@@ -223,7 +216,6 @@ function Dashboard({ user }) {
           </button>
         </div>
 
-        {/* PREMIUM */}
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4">
           <h3>Premium</h3>
           <p className="text-white/60 mb-3">Free Plan</p>
