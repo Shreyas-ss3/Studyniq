@@ -1,6 +1,5 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 
 import { auth } from "./firebase";
 import {
@@ -8,6 +7,8 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 
 import "./App.css";
@@ -66,11 +67,19 @@ function Login() {
 
   const signup = async () => {
     try {
-      const res = await createUserWithEmailAndPassword(auth, email, password);
-      console.log("SIGNUP SUCCESS:", res.user);
+      await createUserWithEmailAndPassword(auth, email, password);
       nav("/app");
     } catch (err) {
-      console.error(err.message);
+      alert(err.message);
+    }
+  };
+
+  const googleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      nav("/app");
+    } catch (err) {
       alert(err.message);
     }
   };
@@ -78,6 +87,7 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
       <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-6 rounded-2xl w-[300px]">
+
         <h2 className="text-2xl mb-4">Studyniq</h2>
 
         <input
@@ -99,9 +109,17 @@ function Login() {
           Login
         </button>
 
-        <button onClick={signup} className="w-full bg-purple-500 py-2 rounded">
+        <button onClick={signup} className="w-full bg-purple-500 py-2 rounded mb-2">
           Sign Up
         </button>
+
+        <button
+          onClick={googleLogin}
+          className="w-full bg-red-500 py-2 rounded"
+        >
+          Continue with Google
+        </button>
+
       </div>
     </div>
   );
@@ -145,7 +163,7 @@ function Dashboard({ user }) {
       await signOut(auth);
       nav("/login");
     } catch (err) {
-      console.error(err);
+      alert(err.message);
     }
   };
 
