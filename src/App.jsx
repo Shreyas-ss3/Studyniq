@@ -23,7 +23,7 @@ function Home() {
     });
 
     return () => unsub();
-  }, [nav]);
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
@@ -130,7 +130,7 @@ function Dashboard({ user }) {
 
   useEffect(() => {
     if (!user) nav("/login");
-  }, [user, nav]);
+  }, [user]);
 
   useEffect(() => {
     let timer;
@@ -245,14 +245,24 @@ function Dashboard({ user }) {
 /* ---------------- APP ROUTES ---------------- */
 export default function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
+      setLoading(false);
     });
 
     return () => unsub();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <Routes>
