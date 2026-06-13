@@ -21,27 +21,21 @@ function Home() {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) nav("/app");
     });
-
     return () => unsub();
-  }, []);
+  }, [nav]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
-      <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-2xl p-10 text-center text-white w-[350px]">
-
-        <h1 className="text-5xl font-bold mb-4">Studyniq</h1>
-
-        <p className="text-white/80 mb-6">
-          Study smarter. Stay focused. Achieve top grades.
-        </p>
+    <div className="h-screen flex items-center justify-center bg-slate-950 text-white">
+      <div className="bg-slate-900 border border-slate-700 p-10 rounded-2xl text-center w-[360px] shadow-xl">
+        <h1 className="text-4xl font-bold mb-2">Studyniq</h1>
+        <p className="text-slate-400 mb-6">Study smarter. Stay focused.</p>
 
         <button
           onClick={() => nav("/login")}
-          className="bg-white text-black px-6 py-2 rounded-xl font-semibold"
+          className="bg-indigo-500 hover:bg-indigo-600 px-5 py-2 rounded-lg w-full"
         >
           Get Started
         </button>
-
       </div>
     </div>
   );
@@ -49,16 +43,16 @@ function Home() {
 
 /* ---------------- LOGIN ---------------- */
 function Login() {
+  const nav = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const nav = useNavigate();
 
   const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       nav("/app");
-    } catch (err) {
-      alert(err.message);
+    } catch (e) {
+      alert(e.message);
     }
   };
 
@@ -66,8 +60,8 @@ function Login() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       nav("/app");
-    } catch (err) {
-      alert(err.message);
+    } catch (e) {
+      alert(e.message);
     }
   };
 
@@ -76,26 +70,25 @@ function Login() {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       nav("/app");
-    } catch (err) {
-      alert(err.message);
+    } catch (e) {
+      alert(e.message);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
-      <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-6 rounded-2xl w-[300px]">
-
-        <h2 className="text-2xl mb-4">Studyniq</h2>
+    <div className="h-screen flex items-center justify-center bg-slate-950 text-white">
+      <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl w-[320px]">
+        <h2 className="text-2xl mb-4">Login</h2>
 
         <input
-          className="w-full p-2 mb-3 rounded bg-white/10 border border-white/20"
+          className="w-full p-2 mb-2 bg-slate-800 rounded"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
-          className="w-full p-2 mb-3 rounded bg-white/10 border border-white/20"
+          className="w-full p-2 mb-3 bg-slate-800 rounded"
           placeholder="Password"
           type="password"
           value={password}
@@ -106,14 +99,13 @@ function Login() {
           Login
         </button>
 
-        <button onClick={signup} className="w-full bg-purple-500 py-2 rounded mb-2">
+        <button onClick={signup} className="w-full bg-indigo-500 py-2 rounded mb-2">
           Sign Up
         </button>
 
         <button onClick={googleLogin} className="w-full bg-red-500 py-2 rounded">
           Continue with Google
         </button>
-
       </div>
     </div>
   );
@@ -121,39 +113,36 @@ function Login() {
 
 /* ---------------- DASHBOARD ---------------- */
 function Dashboard({ user }) {
-  const [tasks, setTasks] = useState([]);
-  const [task, setTask] = useState("");
-  const [time, setTime] = useState(1500);
-  const [active, setActive] = useState(false);
-
   const nav = useNavigate();
 
+  const [tasks, setTasks] = useState([]);
+  const [task, setTask] = useState("");
+  const [premium, setPremium] = useState(false);
+
+  const key = `tasks_${user?.uid}`;
+  const premKey = `premium_${user?.uid}`;
+
+  /* load saved data */
   useEffect(() => {
-    if (!user) nav("/login");
+    const saved = localStorage.getItem(key);
+    const prem = localStorage.getItem(premKey);
+
+    if (saved) setTasks(JSON.parse(saved));
+    if (prem) setPremium(true);
   }, [user]);
 
   useEffect(() => {
-    let timer;
-    if (active && time > 0) {
-      timer = setInterval(() => setTime((t) => t - 1), 1000);
-    }
-    return () => clearInterval(timer);
-  }, [active, time]);
+    if (user) localStorage.setItem(key, JSON.stringify(tasks));
+  }, [tasks]);
 
   const addTask = () => {
     if (!task.trim()) return;
-
-    const newTask = {
-      id: Date.now(),
-      text: task,
-    };
-
-    setTasks((prev) => [...prev, newTask]);
+    setTasks([...tasks, { id: Date.now(), text: task }]);
     setTask("");
   };
 
   const deleteTask = (id) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    setTasks(tasks.filter((t) => t.id !== id));
   };
 
   const logout = async () => {
@@ -161,49 +150,52 @@ function Dashboard({ user }) {
     nav("/login");
   };
 
-  const formatTime = (t) => {
-    const m = Math.floor(t / 60);
-    const s = t % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
+  const upgrade = () => {
+    setPremium(true);
+    localStorage.setItem(premKey, "true");
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6">
+    <div className="flex h-screen bg-slate-950 text-white">
 
-      <div className="flex justify-between mb-6">
-        <h2 className="text-2xl font-bold">Studyniq</h2>
+      {/* SIDEBAR */}
+      <div className="w-64 bg-slate-900 border-r border-slate-800 p-4">
+        <h1 className="text-xl font-bold mb-6">Studyniq</h1>
 
-        <div className="flex gap-4 items-center">
-          <p className="text-white/60">{user?.email}</p>
+        <p className="text-slate-400 text-sm mb-4">{user.email}</p>
 
-          <button onClick={logout} className="bg-red-500 px-3 py-1 rounded">
-            Logout
-          </button>
+        <button
+          onClick={logout}
+          className="w-full bg-red-500 py-2 rounded mb-4"
+        >
+          Logout
+        </button>
+
+        <div className="text-sm text-slate-400">
+          {premium ? "💎 Premium Active" : "Free Plan"}
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      {/* MAIN */}
+      <div className="flex-1 p-6 grid grid-cols-3 gap-6">
 
         {/* TASKS */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4">
-          <h3 className="mb-3">Tasks</h3>
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <h2 className="mb-3 font-semibold">Tasks</h2>
 
           <input
-            className="w-full p-2 mb-2 bg-white/10 border border-white/20 rounded"
+            className="w-full p-2 mb-2 bg-slate-800 rounded"
             value={task}
             onChange={(e) => setTask(e.target.value)}
           />
 
-          <button onClick={addTask} className="bg-white text-black px-3 py-1 rounded">
+          <button onClick={addTask} className="bg-indigo-500 px-3 py-1 rounded mb-3">
             Add
           </button>
 
           {tasks.map((t) => (
-            <div
-              key={t.id}
-              className="mt-2 bg-white/10 p-2 rounded flex justify-between"
-            >
-              <span>{t.text}</span>
+            <div key={t.id} className="flex justify-between bg-slate-800 p-2 rounded mb-2">
+              {t.text}
               <button onClick={() => deleteTask(t.id)} className="text-red-400">
                 ✕
               </button>
@@ -212,37 +204,39 @@ function Dashboard({ user }) {
         </div>
 
         {/* TIMER */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
-          <h3>Pomodoro</h3>
-          <h1 className="text-4xl my-4">{formatTime(time)}</h1>
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <h2 className="mb-3 font-semibold">Pomodoro</h2>
 
-          <button onClick={() => setActive(true)} className="bg-green-500 px-2 py-1 rounded m-1">
-            Start
-          </button>
-          <button onClick={() => setActive(false)} className="bg-yellow-500 px-2 py-1 rounded m-1">
-            Pause
-          </button>
-          <button onClick={() => setTime(1500)} className="bg-red-500 px-2 py-1 rounded m-1">
-            Reset
-          </button>
+          <p className="text-slate-400">25:00 timer placeholder</p>
         </div>
 
         {/* PREMIUM */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4">
-          <h3>Premium</h3>
-          <p className="text-white/60 mb-3">Free Plan</p>
+        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+          <h2 className="mb-3 font-semibold">Premium</h2>
 
-          <button className="bg-gradient-to-r from-pink-500 to-purple-500 px-3 py-2 rounded">
-            Upgrade £2.99/month
-          </button>
+          {!premium ? (
+            <>
+              <p className="text-slate-400 mb-3">
+                Unlock themes + advanced tools
+              </p>
+
+              <button
+                onClick={upgrade}
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-2 rounded"
+              >
+                Upgrade (Free Demo)
+              </button>
+            </>
+          ) : (
+            <p className="text-green-400">Premium unlocked 🎉</p>
+          )}
         </div>
-
       </div>
     </div>
   );
 }
 
-/* ---------------- APP ROUTES ---------------- */
+/* ---------------- APP ---------------- */
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -258,7 +252,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+      <div className="h-screen flex items-center justify-center bg-slate-950 text-white">
         Loading...
       </div>
     );
