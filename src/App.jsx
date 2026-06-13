@@ -29,9 +29,7 @@ function Home() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
-
       <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-2xl p-10 text-center text-white w-[350px]">
-
         <h1 className="text-5xl font-bold mb-4">Studyniq</h1>
 
         <p className="text-white/80 mb-6">
@@ -46,7 +44,6 @@ function Home() {
             Get Started
           </button>
         )}
-
       </div>
     </div>
   );
@@ -68,19 +65,15 @@ function Login() {
   };
 
   const signup = async () => {
-  try {
-    const res = await createUserWithEmailAndPassword(auth, email, password);
-
-    console.log("✅ SIGNUP SUCCESS:", res.user);
-
-    nav("/app");
-  } catch (err) {
-    console.error("❌ SIGNUP ERROR CODE:", err.code);
-    console.error("❌ SIGNUP ERROR MESSAGE:", err.message);
-
-    alert(err.message);
-  }
-};
+    try {
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("SIGNUP SUCCESS:", res.user);
+      nav("/app");
+    } catch (err) {
+      console.error(err.message);
+      alert(err.message);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
@@ -121,9 +114,11 @@ function Dashboard({ user }) {
   const [time, setTime] = useState(1500);
   const [active, setActive] = useState(false);
 
-  const logout = async () => {
-    await signOut(auth);
-  };
+  const nav = useNavigate();
+
+  useEffect(() => {
+    if (!user) nav("/login");
+  }, [user]);
 
   useEffect(() => {
     let timer;
@@ -145,6 +140,15 @@ function Dashboard({ user }) {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      nav("/login");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-white p-6">
 
@@ -153,6 +157,7 @@ function Dashboard({ user }) {
 
         <div className="flex gap-4 items-center">
           <p className="text-white/60">{user?.email}</p>
+
           <button onClick={logout} className="bg-red-500 px-3 py-1 rounded">
             Logout
           </button>
@@ -229,7 +234,10 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/app" element={<Dashboard user={user} />} />
+      <Route
+        path="/app"
+        element={user ? <Dashboard user={user} /> : <Login />}
+      />
     </Routes>
   );
 }
