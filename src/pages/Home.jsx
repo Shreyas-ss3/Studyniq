@@ -1,7 +1,6 @@
 import React from 'react';
 
 export default function Home({ onNavigate }) {
-  // Smooth scroll handler function
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -57,21 +56,45 @@ export default function Home({ onNavigate }) {
             <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest">Platform Features</span>
             <h2 className="text-3xl font-black text-gray-900 tracking-tight">Everything you need to ace your exams</h2>
           </div>
+          
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="p-6 bg-slate-50 rounded-2xl border border-gray-50 space-y-3">
-              <div className="text-2xl">📇</div>
-              <h3 className="font-bold text-gray-900">Spaced Repetition</h3>
-              <p className="text-xs text-gray-500 font-medium leading-relaxed">Our algorithmic flashcard tool prompts revision topics right before you are likely to forget them.</p>
+            {/* Feature 1 */}
+            <div className="p-6 bg-slate-50 rounded-3xl border border-gray-100 space-y-4 overflow-hidden flex flex-col justify-between">
+              <div className="space-y-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1513258496099-48168024aec0?w=500&auto=format&fit=crop&q=60" 
+                  alt="Spaced Repetition Flashcards" 
+                  className="w-full h-36 object-cover rounded-2xl shadow-inner bg-slate-200"
+                />
+                <h3 className="font-bold text-gray-900 pt-1">Spaced Repetition</h3>
+                <p className="text-xs text-gray-500 font-medium leading-relaxed">Our algorithmic flashcard tool prompts revision topics right before you are likely to forget them.</p>
+              </div>
             </div>
-            <div className="p-6 bg-slate-50 rounded-2xl border border-gray-50 space-y-3">
-              <div className="text-2xl">⏱️</div>
-              <h3 className="font-bold text-gray-900">Focus Timers</h3>
-              <p className="text-xs text-gray-500 font-medium leading-relaxed">Integrated custom Pomodoro timers sync automatically to dynamic daily progress scoreboards.</p>
+
+            {/* Feature 2 */}
+            <div className="p-6 bg-slate-50 rounded-3xl border border-gray-100 space-y-4 overflow-hidden flex flex-col justify-between">
+              <div className="space-y-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&auto=format&fit=crop&q=60" 
+                  alt="Focus Pomodoro Timers" 
+                  className="w-full h-36 object-cover rounded-2xl shadow-inner bg-slate-200"
+                />
+                <h3 className="font-bold text-gray-900 pt-1">Focus Timers</h3>
+                <p className="text-xs text-gray-500 font-medium leading-relaxed">Integrated custom Pomodoro timers sync automatically to dynamic daily progress scoreboards.</p>
+              </div>
             </div>
-            <div className="p-6 bg-slate-50 rounded-2xl border border-gray-50 space-y-3">
-              <div className="text-2xl">📈</div>
-              <h3 className="font-bold text-gray-900">Analytics Logs</h3>
-              <p className="text-xs text-gray-500 font-medium leading-relaxed">Track metrics across subjects and visualize study habit trends using streak milestone metrics.</p>
+
+            {/* Feature 3 */}
+            <div className="p-6 bg-slate-50 rounded-3xl border border-gray-100 space-y-4 overflow-hidden flex flex-col justify-between">
+              <div className="space-y-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60" 
+                  alt="Analytics Data Logs" 
+                  className="w-full h-36 object-cover rounded-2xl shadow-inner bg-slate-200"
+                />
+                <h3 className="font-bold text-gray-900 pt-1">Analytics Logs</h3>
+                <p className="text-xs text-gray-500 font-medium leading-relaxed">Track metrics across subjects and visualize study habit trends using streak milestone metrics.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -102,14 +125,14 @@ export default function Home({ onNavigate }) {
             <h2 className="text-3xl font-black tracking-tight">Free while in beta testing</h2>
           </div>
           <div className="bg-white/5 border border-white/10 p-8 rounded-3xl max-w-sm mx-auto space-y-6">
-            <h3 className="font-bold text-lg">Studyniq</h3>
-            <div className="text-4xl font-black">$0 <span className="text-xs text-indigo-300 font-medium"></span></div>
+            <h3 className="font-bold text-lg">Beta Explorer</h3>
+            <div className="text-4xl font-black">$0 <span className="text-xs text-indigo-300 font-medium">/ forever</span></div>
             <p className="text-xs text-gray-400 font-medium leading-relaxed">Enjoy unconditional access to all revision structures, flashcards, timers, and metrics during early development.</p>
             <button 
               onClick={() => onNavigate('login')}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-3 rounded-xl transition-all"
             >
-              Join Studyniq now!
+              Join the Beta Profile
             </button>
           </div>
         </div>
