@@ -12,7 +12,7 @@ export default function Login({
   onNavigate 
 }) {
   const [mode, setMode] = useState('login');
-  const [modalContent, setModalContent] = useState(null); // Tracks if 'terms' or 'privacy' modal is open
+  const [modalContent, setModalContent] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -125,7 +125,7 @@ export default function Login({
           </div>
         </div>
 
-        {/* Right Info side panel */}
+        {/* Right Info and Testimonials Side Banner */}
         <div className="md:col-span-6 bg-slate-50 border-l border-gray-100 p-10 flex flex-col justify-between relative overflow-hidden">
           <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm max-w-sm space-y-4">
             <h3 className="font-black text-sm text-gray-800">
@@ -143,4 +143,45 @@ export default function Login({
               "studyniq has completely changed the way I study. It's like having everything I need in one single place!"
             </p>
             <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">J</div>
+              <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">S</div>
+              <div>
+                <h4 className="text-xs font-bold">Shreyas</h4>
+                <p className="text-[10px] text-indigo-200">Year 11 Student</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pop-up Overlay Legal Modals */}
+      {modalContent && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white border border-slate-100 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <h3 className="font-black text-base text-slate-900 capitalize">
+                {modalContent === 'terms' ? 'Terms of Service' : 'Privacy Policy'}
+              </h3>
+              <button onClick={() => setModalContent(null)} className="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+            </div>
+            <div className="text-xs text-slate-500 font-medium space-y-3 max-h-60 overflow-y-auto leading-relaxed pr-1">
+              {modalContent === 'terms' ? (
+                <>
+                  <p className="font-bold text-slate-800">Welcome to studyniq!</p>
+                  <p>By using our platform, you agree to follow our simple community standards. This application provides educational utilities including note management systems, flashcards, mock quizzes, and study progress logs.</p>
+                </>
+              ) : (
+                <>
+                  <p className="font-bold text-slate-800">Your privacy matters to us.</p>
+                  <p>We capture user email credentials and session validation tokens through our secure partner connection layers to synchronize tasks, timer counters, and streak metrics smoothly.</p>
+                </>
+              )}
+            </div>
+            <button onClick={() => setModalContent(null)} className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl transition-all">
+              I Understand
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
