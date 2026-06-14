@@ -119,11 +119,10 @@ function Dashboard({ user }) {
   const [streak, setStreak] = useState(0);
 
   const key = user ? `tasks_${user.uid}` : null;
-
   const streakKey = user ? `streak_${user.uid}` : null;
   const lastLoginKey = user ? `lastLogin_${user.uid}` : null;
 
-  /* LOAD DATA + STREAK SYSTEM */
+  /* ---------------- LOAD DATA + STREAK ---------------- */
   useEffect(() => {
     if (!user) return;
 
@@ -143,15 +142,16 @@ function Dashboard({ user }) {
     } else {
       setStreak(savedStreak);
     }
+  }, [user, key, streakKey, lastLoginKey]);
 
-  /* SAVE TASKS */
+  /* ---------------- SAVE TASKS ---------------- */
   useEffect(() => {
-    if (user) {
+    if (user && key) {
       localStorage.setItem(key, JSON.stringify(tasks));
     }
-  }, [tasks]);
+  }, [tasks, user, key]);
 
-  /* TIMER */
+  /* ---------------- TIMER ---------------- */
   useEffect(() => {
     let timer;
 
@@ -164,7 +164,7 @@ function Dashboard({ user }) {
     return () => clearInterval(timer);
   }, [running, time]);
 
-  /* ALARM WHEN TIMER HITS 0 */
+  /* ---------------- ALARM ---------------- */
   useEffect(() => {
     if (time === 0) {
       setRunning(false);
@@ -199,7 +199,6 @@ function Dashboard({ user }) {
 
   return (
     <div className="bg-slate-950 text-white">
-
       <div className="flex h-screen">
 
         {/* SIDEBAR */}
@@ -220,7 +219,7 @@ function Dashboard({ user }) {
           </button>
         </div>
 
-        {/* MAIN (UPDATED LAYOUT) */}
+        {/* MAIN */}
         <div className="flex-1 p-8 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
 
           <div className="mb-8">
@@ -245,14 +244,23 @@ function Dashboard({ user }) {
                 onChange={(e) => setTask(e.target.value)}
               />
 
-              <button onClick={addTask} className="bg-indigo-500 px-3 py-1 rounded mb-3">
+              <button
+                onClick={addTask}
+                className="bg-indigo-500 px-3 py-1 rounded mb-3"
+              >
                 Add
               </button>
 
               {tasks.map((t) => (
-                <div key={t.id} className="flex justify-between bg-slate-800 p-2 rounded mb-2">
+                <div
+                  key={t.id}
+                  className="flex justify-between bg-slate-800 p-2 rounded mb-2"
+                >
                   {t.text}
-                  <button onClick={() => deleteTask(t.id)} className="text-red-400">
+                  <button
+                    onClick={() => deleteTask(t.id)}
+                    className="text-red-400"
+                  >
                     ✕
                   </button>
                 </div>
@@ -307,10 +315,7 @@ function Dashboard({ user }) {
             </div>
 
           </div>
-
         </div>
-
-        {/* extra closing div as requested */}
       </div>
     </div>
   );
