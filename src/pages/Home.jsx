@@ -5,8 +5,7 @@ export default function Home({ onNavigate }) {
     { title: "Smart Notes", desc: "Clear, concise notes written to help you understand and remember.", icon: "📄" },
     { title: "Flashcards", desc: "Spaced repetition flashcards to boost memory and long-term retention.", icon: "📇" },
     { title: "Practice Questions", desc: "Exam-style questions and instant feedback to test your understanding.", icon: "❓" },
-    { title: "Progress Tracking", desc: "Track your progress, set goals and stay motivated every step of the way.", icon: "📈" },
-    { title: "All Subjects", desc: "Maths, Science, English, History and more – all in one place.", icon: "📚" }
+    { title: "Progress Tracking", desc: "Track your progress, set goals and stay motivated every step of the way.", icon: "📈" }
   ];
 
   return (
