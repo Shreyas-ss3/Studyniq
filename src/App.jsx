@@ -175,10 +175,17 @@ function Dashboard({ user }) {
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <Topbar user={user} streak={streak} />
+        {/* 🔌 Connected Topbar hooks to control user logouts and account configuration views */}
+        <Topbar 
+          user={user} 
+          streak={streak} 
+          onLogout={logout} 
+          setActiveTab={setActiveTab} 
+        />
 
         <main className="flex-1 overflow-y-auto p-8 max-w-7xl w-full mx-auto space-y-8">
           
+          {/* Main Dashboard Panel Layout */}
           {activeTab === 'dashboard' && (
             <>
               {/* Top Row Hero Grid Banner & Metric Column */}
@@ -323,9 +330,42 @@ function Dashboard({ user }) {
             </>
           )}
 
+          {/* Flashcards View Route */}
           {activeTab === 'flashcards' && <FlashcardsSection user={user} />}
           
-          {activeTab !== 'dashboard' && activeTab !== 'flashcards' && (
+          {/* ⚙️ Account Settings Panel Layout Content View */}
+          {activeTab === 'settings' && (
+            <div className="bg-white border border-gray-100 p-8 rounded-3xl max-w-2xl space-y-6 shadow-sm">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Account Settings</h2>
+                <p className="text-xs text-gray-400 mt-1">Manage your studyniq account configurations and app preferences.</p>
+              </div>
+              
+              <hr className="border-gray-100" />
+              
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-1">
+                  <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
+                  <input 
+                    disabled 
+                    value={user?.email || ''} 
+                    className="p-2.5 bg-gray-50 border border-gray-100 text-xs font-medium text-gray-500 rounded-xl max-w-md cursor-not-allowed focus:outline-none"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <h4 className="text-xs font-bold text-gray-800">Study Preferences</h4>
+                  <label className="flex items-center gap-2 mt-2.5 cursor-pointer select-none">
+                    <input type="checkbox" defaultChecked className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5" />
+                    <span className="text-xs text-gray-600 font-medium">Receive daily streak notifications and study reminders</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Dynamic Module Fallback Shell Container */}
+          {activeTab !== 'dashboard' && activeTab !== 'flashcards' && activeTab !== 'settings' && (
             <div className="bg-white text-gray-800 border border-gray-100 p-12 rounded-3xl text-center text-gray-400 font-medium text-sm">
               <p>The workspace container view for the "{activeTab}" module is ready to accept custom layouts.</p>
             </div>
@@ -351,7 +391,7 @@ export default function App() {
     return () => unsub();
   }, []);
 
-  // 🛡️ CRITICAL FIX: Halts router evaluation entirely until Firebase finishes loading the active session state
+  // Halts router evaluation entirely until Firebase finishes loading the active session state
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center bg-[#F8FAFC] text-indigo-600 font-semibold text-sm">
@@ -362,7 +402,6 @@ export default function App() {
 
   return (
     <Routes>
-      {/* 🚀 FIXED: Dynamic onboarding routing logic that respects real-time session statuses */}
       <Route 
         path="/" 
         element={user ? <Navigate to="/app" replace /> : <Home onNavigate={(dest) => nav(dest === 'login' ? '/login' : '/')} />} 
