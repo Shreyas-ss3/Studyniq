@@ -8,10 +8,11 @@ export default function Login({
   onLogin, 
   onSignup, 
   onGoogleLogin, 
-  onForgotPassword, // <- Accept the new prop here
+  onForgotPassword, 
   onNavigate 
 }) {
   const [mode, setMode] = useState('login');
+  const [modalContent, setModalContent] = useState(null); // Tracks if 'terms' or 'privacy' modal is open
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,7 +24,7 @@ export default function Login({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 font-sans flex items-center justify-center p-4 relative">
       <div className="max-w-5xl w-full bg-white rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden grid md:grid-cols-12 min-h-[640px]">
         
         {/* Left Interactive Auth Block */}
@@ -70,8 +71,11 @@ export default function Login({
                   {mode === 'login' && (
                     <button 
                       type="button"
-                      onClick={onForgotPassword} // <- Attach function here
-                      className="text-xs font-bold text-indigo-600 hover:underline bg-none border-none cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onForgotPassword();
+                      }}
+                      className="text-xs font-bold text-indigo-600 hover:underline bg-transparent border-none p-0 cursor-pointer outline-none"
                     >
                       Forgot password?
                     </button>
@@ -114,7 +118,10 @@ export default function Login({
           </div>
 
           <div className="text-[10px] font-semibold text-gray-400 text-center max-w-sm mx-auto leading-relaxed">
-            By continuing, you agree to our <span className="text-indigo-600 hover:underline cursor-pointer">Terms of Service</span> and <span className="text-indigo-600 hover:underline cursor-pointer">Privacy Policy</span>.
+            By continuing, you agree to our{' '}
+            <span onClick={() => setModalContent('terms')} className="text-indigo-600 hover:underline cursor-pointer font-bold">Terms of Service</span>
+            {' '}and{' '}
+            <span onClick={() => setModalContent('privacy')} className="text-indigo-600 hover:underline cursor-pointer font-bold">Privacy Policy</span>.
           </div>
         </div>
 
@@ -136,16 +143,4 @@ export default function Login({
               "studyniq has completely changed the way I study. It's like having everything I need in one single place!"
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">J</div>
-              <div>
-                <h4 className="text-xs font-bold">Jessica</h4>
-                <p className="text-[10px] text-indigo-200">Year 11 Student</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
-}
+              <div className="w-8 h
