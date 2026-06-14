@@ -79,6 +79,7 @@ function LoginWrapper() {
       onLogin={handleLogin}
       onSignup={handleSignup}
       onGoogleLogin={handleGoogleLogin}
+      onForgotPassword={handleForgotPassword}
       onNavigate={(destination) => nav(destination === 'home' ? '/' : `/${destination}`)}
     />
   );
