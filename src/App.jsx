@@ -165,14 +165,15 @@ function Dashboard({ user }) {
 
   return (
     <div className="antialiased min-h-screen flex bg-[#F8FAFC] text-gray-800">
-    <Sidebar 
-  user={user}
-  streak={streak}
-  activeTab={activeTab}
-  setActiveTab={setActiveTab}
-  onLogout={onLogout} //  Uses the exact prop variable your app uses
-  onNavigateLanding={() => setForceShowLanding(true)} // 👈 Toggles layout conditionally if your router is local state-bound
-/>
+      {/* 🛠️ FIXED: corrected onLogout reference, and pointed the landing redirect straight to nav('/') */}
+      <Sidebar 
+        user={user}
+        streak={streak}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onLogout={logout} 
+        onNavigateLanding={() => nav("/")} 
+      />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <Topbar user={user} streak={streak} />
@@ -369,6 +370,8 @@ export default function App() {
       <Route 
         path="/app" 
         element={user ? <Dashboard user={user} /> : <Navigate to="/login" replace />} 
+        // 💡 Note: If you want clicking the sidebar logo to show the homepage while logged in,
+        // we keep the auth-guard active here, and use the custom layout hook inside Sidebar!
       />
     </Routes>
   );
