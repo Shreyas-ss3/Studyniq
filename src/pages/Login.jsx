@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-export default function Login({ onLoginSuccess, onNavigate }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function Login({ 
+  email, 
+  setEmail, 
+  password, 
+  setPassword, 
+  onLogin, 
+  onSignup, 
+  onGoogleLogin, 
+  onNavigate 
+}) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Execute default successful login route back into dashboard shell layout
-    onLoginSuccess();
+    onLogin();
   };
 
   return (
@@ -18,7 +24,10 @@ export default function Login({ onLoginSuccess, onNavigate }) {
         <div className="md:col-span-6 p-10 flex flex-col justify-between space-y-8">
           <div className="flex items-center justify-between">
             <span onClick={() => onNavigate('home')} className="text-2xl font-black text-indigo-600 tracking-tight cursor-pointer">studyniq</span>
-            <div className="text-xs font-bold text-gray-400">Don't have an account? <span className="text-indigo-600 cursor-pointer hover:underline">Sign up</span></div>
+            <div className="text-xs font-bold text-gray-400">
+              Don't have an account?{' '}
+              <span onClick={onSignup} className="text-indigo-600 cursor-pointer hover:underline">Sign up</span>
+            </div>
           </div>
 
           <div className="max-w-sm w-full mx-auto space-y-6">
@@ -29,12 +38,12 @@ export default function Login({ onLoginSuccess, onNavigate }) {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Email or Username</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Email address</label>
                 <input 
-                  type="text" 
+                  type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email or username" 
+                  placeholder="Enter your email" 
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold bg-slate-50/50 focus:outline-none focus:border-indigo-500 transition-colors"
                   required
                 />
@@ -69,18 +78,15 @@ export default function Login({ onLoginSuccess, onNavigate }) {
               <div className="flex-grow border-t border-gray-100"></div>
             </div>
 
-            {/* Social Integrations Sign-in Blocks */}
-            <div className="space-y-2.5">
-              {['Google', 'Microsoft', 'Apple'].map((provider) => (
-                <button 
-                  key={provider}
-                  type="button"
-                  onClick={handleSubmit}
-                  className="w-full border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
-                >
-                  Continue with {provider}
-                </button>
-              ))}
+            {/* Google Authentication Only */}
+            <div>
+              <button 
+                type="button"
+                onClick={onGoogleLogin}
+                className="w-full border border-gray-200 hover:bg-gray-50 text-gray-600 text-sm font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
+              >
+                🌐 Continue with Google
+              </button>
             </div>
           </div>
 
