@@ -170,7 +170,7 @@ function Dashboard({ user }) {
   streak={streak}
   activeTab={activeTab}
   setActiveTab={setActiveTab}
-  onLogout={handleLogout}
+  onLogout={onLogout} //  Uses the exact prop variable your app uses
   onNavigateLanding={() => setForceShowLanding(true)} // 👈 Toggles layout conditionally if your router is local state-bound
 />
 
