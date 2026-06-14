@@ -1,4 +1,8 @@
 import React from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+
+const STRIPE_PUBLISHABLE_KEY = "pk_test_51TcNaMDsXgTcZ1Jba90N19EMlyUxTKzVdNR8KzwkcuPegizvN05O0iomC5BzX97FAk0rVPwQRAs7vh8llJ4dywSR00JCaVtyAz";
+const STRIPE_PRODUCT_PRICE_ID = "price_1TcODHDsXgTcZ1JbAJtLUpSB"; 
 
 export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTab }) {
   const primaryNav = [
@@ -19,6 +23,39 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
     { id: 'achievements', name: 'Achievements', icon: '🏅' },
     { id: 'groups', name: 'Study Groups', icon: '👥' },
   ];
+
+  // Direct Frontend Checkout Logic
+  const handlePremiumCheckout = async () => {
+    try {
+      // 1. Initialize Stripe directly in the browser
+      const stripe = await loadStripe(STRIPE_PUBLISHABLE_KEY);
+      
+      if (!stripe) {
+        alert("Stripe failed to load. Check your Publishable Key configuration.");
+        return;
+      }
+
+      // 2. Redirect the user straight to a Stripe-hosted checkout page
+      const { error } = await stripe.redirectToCheckout({
+        lineItems: [{
+          price: STRIPE_PRODUCT_PRICE_ID,
+          quantity: 1,
+        }],
+        mode: 'subscription',
+        successUrl: window.location.origin + '/app?session_id={CHECKOUT_SESSION_ID}',
+        cancelUrl: window.location.origin + '/app',
+        // Optional: Pre-fills the user's email if logged into your Firebase App
+        customerEmail: user?.email || undefined, 
+      });
+
+      if (error) {
+        console.error("Stripe Redirect Error:", error.message);
+        alert(error.message);
+      }
+    } catch (err) {
+      console.error("Checkout Execution Failed:", err);
+    }
+  };
 
   return (
     <aside className="w-64 bg-white border-r border-gray-100 flex flex-col justify-between p-5 hidden md:flex h-screen overflow-y-auto">
@@ -82,7 +119,7 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
             Go Premium for unlimited access to all features.
           </p>
           <button 
-            onClick={() => alert("Redirecting to Stripe Premium subscription checkout... (£2.99/mo)")}
+            onClick={handlePremiumCheckout}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm shadow-indigo-200"
           >
             Go Premium • £2.99
