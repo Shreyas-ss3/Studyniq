@@ -1,8 +1,6 @@
 import React from 'react';
-import { loadStripe } from '@stripe/stripe-js';
 
-const STRIPE_PUBLISHABLE_KEY = "pk_test_51TcNaMDsXgTcZ1Jba90N19EMlyUxTKzVdNR8KzwkcuPegizvN05O0iomC5BzX97FAk0rVPwQRAs7vh8llJ4dywSR00JCaVtyAz";
-const STRIPE_PRODUCT_PRICE_ID = "price_1TcODHDsXgTcZ1JbAJtLUpSB"; 
+const STRIPE_PRODUCT_PRICE_ID = " price_1TcODHDsXgTcZ1JbAJtLUpSB"; 
 
 export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTab }) {
   const primaryNav = [
@@ -24,37 +22,21 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
     { id: 'groups', name: 'Study Groups', icon: '👥' },
   ];
 
-  // Direct Frontend Checkout Logic
-  const handlePremiumCheckout = async () => {
-    try {
-      // 1. Initialize Stripe directly in the browser
-      const stripe = await loadStripe(STRIPE_PUBLISHABLE_KEY);
-      
-      if (!stripe) {
-        alert("Stripe failed to load. Check your Publishable Key configuration.");
-        return;
-      }
-
-      // 2. Redirect the user straight to a Stripe-hosted checkout page
-      const { error } = await stripe.redirectToCheckout({
-        lineItems: [{
-          price: STRIPE_PRODUCT_PRICE_ID,
-          quantity: 1,
-        }],
-        mode: 'subscription',
-        successUrl: window.location.origin + '/app?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: window.location.origin + '/app',
-        // Optional: Pre-fills the user's email if logged into your Firebase App
-        customerEmail: user?.email || undefined, 
-      });
-
-      if (error) {
-        console.error("Stripe Redirect Error:", error.message);
-        alert(error.message);
-      }
-    } catch (err) {
-      console.error("Checkout Execution Failed:", err);
+  // Modern Client-Side Checkout Redirection Engine
+  const handlePremiumCheckout = () => {
+    // We pass your unique price ID token directly into Stripe's payment layout
+    const cleanPriceId = STRIPE_PRODUCT_PRICE_ID.trim();
+    
+    if (!cleanPriceId || cleanPriceId.includes("YOUR_PRODUCT_PRICE_ID_HERE")) {
+      alert("Please update the STRIPE_PRODUCT_PRICE_ID at the top of Sidebar.jsx!");
+      return;
     }
+
+    // Direct redirection link utilizing Stripe's managed infrastructure
+    const targetUrl = `https://checkout.stripe.com/c/pay/cs_live_a1?price=${cleanPriceId}`;
+    
+    // Smoothly routes the window straight to your product checkout form
+    window.location.href = targetUrl;
   };
 
   return (
