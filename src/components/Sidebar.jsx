@@ -1,6 +1,6 @@
 import React from 'react';
 
-const STRIPE_PRODUCT_PRICE_ID = " price_1TcODHDsXgTcZ1JbAJtLUpSB"; 
+const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400";
 
 export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTab }) {
   const primaryNav = [
@@ -22,21 +22,13 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
     { id: 'groups', name: 'Study Groups', icon: '👥' },
   ];
 
-  // Modern Client-Side Checkout Redirection Engine
   const handlePremiumCheckout = () => {
-    // We pass your unique price ID token directly into Stripe's payment layout
-    const cleanPriceId = STRIPE_PRODUCT_PRICE_ID.trim();
-    
-    if (!cleanPriceId || cleanPriceId.includes("YOUR_PRODUCT_PRICE_ID_HERE")) {
-      alert("Please update the STRIPE_PRODUCT_PRICE_ID at the top of Sidebar.jsx!");
+    if (STRIPE_PAYMENT_LINK.includes("YOUR_ACTUAL_COPIED_LINK_HERE")) {
+      alert("Please update the STRIPE_PAYMENT_LINK at the top of Sidebar.jsx!");
       return;
     }
-
-    // Direct redirection link utilizing Stripe's managed infrastructure
-    const targetUrl = `https://checkout.stripe.com/c/pay/cs_live_a1?price=${cleanPriceId}`;
-    
-    // Smoothly routes the window straight to your product checkout form
-    window.location.href = targetUrl;
+    // Redirects perfectly to your Stripe hosted checkout
+    window.location.href = https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400;
   };
 
   return (
