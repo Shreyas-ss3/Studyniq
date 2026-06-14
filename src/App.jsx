@@ -17,13 +17,6 @@ import "./App.css";
 function Home() {
   const nav = useNavigate();
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) nav("/app");
-    });
-    return () => unsub();
-  }, [nav]);
-
   return (
     <div className="h-screen flex items-center justify-center bg-slate-950 text-white">
       <div className="bg-slate-900 border border-slate-700 p-10 rounded-2xl text-center w-[360px] shadow-xl">
@@ -117,23 +110,77 @@ function Dashboard({ user }) {
 
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState("");
-  const [premium, setPremium] = useState(false);
 
-  const key = `tasks_${user?.uid}`;
-  const premKey = `premium_${user?.uid}`;
+  const [premium] = useState(false);
 
-  /* load saved data */
+  const [time, setTime] = useState(1500);
+  const [running, setRunning] = useState(false);
+
+  const [theme, setTheme] = useState("dark");
+
+  const [streak, setStreak] = useState(0);
+
+  const key = user ? `tasks_${user.uid}` : null;
+
+  const streakKey = user ? `streak_${user.uid}` : null;
+  const lastLoginKey = user ? `lastLogin_${user.uid}` : null;
+
+  /* LOAD DATA + STREAK SYSTEM */
   useEffect(() => {
-    const saved = localStorage.getItem(key);
-    const prem = localStorage.getItem(premKey);
+    if (!user) return;
 
-    if (saved) setTasks(JSON.parse(saved));
-    if (prem) setPremium(true);
+    const savedTasks = localStorage.getItem(key);
+    if (savedTasks) setTasks(JSON.parse(savedTasks));
+
+    const savedStreak = parseInt(localStorage.getItem(streakKey)) || 0;
+    const lastLogin = localStorage.getItem(lastLoginKey);
+
+    const today = new Date().toDateString();
+
+    if (lastLogin !== today) {
+      const newStreak = lastLogin ? savedStreak + 1 : 1;
+      setStreak(newStreak);
+      localStorage.setItem(streakKey, newStreak);
+      localStorage.setItem(lastLoginKey, today);
+    } else {
+      setStreak(savedStreak);
+    }
+
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) setTheme(savedTheme);
   }, [user]);
 
+  /* SAVE TASKS */
   useEffect(() => {
-    if (user) localStorage.setItem(key, JSON.stringify(tasks));
+    if (user) {
+      localStorage.setItem(key, JSON.stringify(tasks));
+    }
   }, [tasks]);
+
+  /* TIMER */
+  useEffect(() => {
+    let timer;
+
+    if (running && time > 0) {
+      timer = setInterval(() => {
+        setTime((prev) => prev - 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(timer);
+  }, [running, time]);
+
+  /* ALARM WHEN TIMER HITS 0 */
+  useEffect(() => {
+    if (time === 0) {
+      setRunning(false);
+
+      const alarm = new Audio(
+        "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
+      );
+      alarm.play();
+    }
+  }, [time]);
 
   const addTask = () => {
     if (!task.trim()) return;
@@ -150,87 +197,139 @@ function Dashboard({ user }) {
     nav("/login");
   };
 
-  const upgrade = () => {
-    setPremium(true);
-    localStorage.setItem(premKey, "true");
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
   };
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white">
+    <div className={theme === "dark" ? "bg-slate-950 text-white" : "bg-white text-black"}>
 
-      {/* SIDEBAR */}
-      <div className="w-64 bg-slate-900 border-r border-slate-800 p-4">
-        <h1 className="text-xl font-bold mb-6">Studyniq</h1>
+      <div className="flex h-screen">
 
-        <p className="text-slate-400 text-sm mb-4">{user.email}</p>
+        {/* SIDEBAR */}
+        <div className="w-64 bg-slate-900 border-r border-slate-800 p-4">
+          <h1 className="text-xl font-bold mb-6">Studyniq</h1>
 
-        <button
-          onClick={logout}
-          className="w-full bg-red-500 py-2 rounded mb-4"
-        >
-          Logout
-        </button>
+          <p className="text-slate-400 text-sm mb-2">{user?.email}</p>
 
-        <div className="text-sm text-slate-400">
-          {premium ? "💎 Premium Active" : "Free Plan"}
-        </div>
-      </div>
+          <p className="text-yellow-400 mb-4">
+            🔥 Streak: {streak} days
+          </p>
 
-      {/* MAIN */}
-      <div className="flex-1 p-6 grid grid-cols-3 gap-6">
-
-        {/* TASKS */}
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <h2 className="mb-3 font-semibold">Tasks</h2>
-
-          <input
-            className="w-full p-2 mb-2 bg-slate-800 rounded"
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-          />
-
-          <button onClick={addTask} className="bg-indigo-500 px-3 py-1 rounded mb-3">
-            Add
+          <button
+            onClick={toggleTheme}
+            className="w-full bg-indigo-500 py-2 rounded mb-2"
+          >
+            Toggle Theme
           </button>
 
-          {tasks.map((t) => (
-            <div key={t.id} className="flex justify-between bg-slate-800 p-2 rounded mb-2">
-              {t.text}
-              <button onClick={() => deleteTask(t.id)} className="text-red-400">
-                ✕
+          <button
+            onClick={logout}
+            className="w-full bg-red-500 py-2 rounded mb-4"
+          >
+            Logout
+          </button>
+        </div>
+
+        {/* MAIN (UPDATED LAYOUT) */}
+        <div className="flex-1 p-8 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
+
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-2">
+              Welcome back 👋
+            </h1>
+
+            <p className="text-slate-400">
+              Ready to smash your study goals today?
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-6">
+
+            {/* TASKS */}
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+              <h2 className="mb-3 font-semibold">Tasks</h2>
+
+              <input
+                className="w-full p-2 mb-2 bg-slate-800 rounded"
+                value={task}
+                onChange={(e) => setTask(e.target.value)}
+              />
+
+              <button onClick={addTask} className="bg-indigo-500 px-3 py-1 rounded mb-3">
+                Add
               </button>
+
+              {tasks.map((t) => (
+                <div key={t.id} className="flex justify-between bg-slate-800 p-2 rounded mb-2">
+                  {t.text}
+                  <button onClick={() => deleteTask(t.id)} className="text-red-400">
+                    ✕
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {/* TIMER */}
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <h2 className="mb-3 font-semibold">Pomodoro</h2>
+            {/* POMODORO */}
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+              <h2 className="mb-3 font-semibold">Pomodoro</h2>
 
-          <p className="text-slate-400">25:00 timer placeholder</p>
-        </div>
+              <h1 className="text-5xl font-bold mb-6">
+                {formatTime(time)}
+              </h1>
 
-        {/* PREMIUM */}
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
-          <h2 className="mb-3 font-semibold">Premium</h2>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setRunning(true)}
+                  className="bg-green-500 px-3 py-2 rounded"
+                >
+                  Start
+                </button>
 
-          {!premium ? (
-            <>
-              <p className="text-slate-400 mb-3">
-                Unlock themes + advanced tools
-              </p>
+                <button
+                  onClick={() => setRunning(false)}
+                  className="bg-yellow-500 px-3 py-2 rounded"
+                >
+                  Pause
+                </button>
+
+                <button
+                  onClick={() => {
+                    setRunning(false);
+                    setTime(1500);
+                  }}
+                  className="bg-red-500 px-3 py-2 rounded"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            {/* PREMIUM */}
+            <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
+              <h2 className="mb-3 font-semibold">Premium</h2>
 
               <button
-                onClick={upgrade}
-                className="bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-2 rounded"
+                disabled
+                className="bg-slate-700 px-3 py-2 rounded cursor-not-allowed"
               >
-                Upgrade (Free Demo)
+                Premium Coming Soon
               </button>
-            </>
-          ) : (
-            <p className="text-green-400">Premium unlocked 🎉</p>
-          )}
+            </div>
+
+          </div>
+
         </div>
+
+        {/* extra closing div as requested */}
       </div>
     </div>
   );
@@ -262,7 +361,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/app" element={user ? <Dashboard user={user} /> : <Login />} />
+      <Route path="/app" element={<Dashboard user={user} />} />
     </Routes>
   );
 }
