@@ -1,6 +1,10 @@
 import React from 'react';
 
+// ========================================================
+// 🔑 CONFIGURATION: FIXED WITH QUOTES
+// ========================================================
 const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400";
+// ========================================================
 
 export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTab }) {
   const primaryNav = [
@@ -23,12 +27,8 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
   ];
 
   const handlePremiumCheckout = () => {
-    if (STRIPE_PAYMENT_LINK.includes("https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400")) {
-      alert("Please update the https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400 at the top of Sidebar.jsx!");
-      return;
-    }
-    // Redirects perfectly to your Stripe hosted checkout
-    window.location.href = "https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400";
+    // Graceful routing wrapper
+    window.location.href = STRIPE_PAYMENT_LINK;
   };
 
   return (
@@ -93,6 +93,7 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
             Go Premium for unlimited access to all features.
           </p>
           <button 
+            type="button"
             onClick={handlePremiumCheckout}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm shadow-indigo-200"
           >
@@ -101,6 +102,7 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
         </div>
 
         <button
+          type="button"
           onClick={onLogout}
           className="w-full text-left px-3 py-2 text-gray-400 hover:text-red-500 text-xs font-bold transition-colors"
         >
