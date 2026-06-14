@@ -116,8 +116,6 @@ function Dashboard({ user }) {
   const [time, setTime] = useState(1500);
   const [running, setRunning] = useState(false);
 
-  const [theme, setTheme] = useState("dark");
-
   const [streak, setStreak] = useState(0);
 
   const key = user ? `tasks_${user.uid}` : null;
@@ -203,14 +201,8 @@ function Dashboard({ user }) {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-  };
-
   return (
-    <div className={theme === "dark" ? "bg-slate-950 text-white" : "bg-white text-black"}>
+    <div className="bg-slate-950 text-white">
 
       <div className="flex h-screen">
 
@@ -223,13 +215,6 @@ function Dashboard({ user }) {
           <p className="text-yellow-400 mb-4">
             🔥 Streak: {streak} days
           </p>
-
-          <button
-            onClick={toggleTheme}
-            className="w-full bg-indigo-500 py-2 rounded mb-2"
-          >
-            Toggle Theme
-          </button>
 
           <button
             onClick={logout}
