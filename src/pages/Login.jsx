@@ -132,7 +132,7 @@ export default function Login({
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">J</div>
               <div>
-                <h4 className="text-xs font-bold">Jessica</h4>
+                <h4 className="text-xs font-bold">Shreyas</h4>
                 <p className="text-[10px] text-indigo-200">Year 11 Student</p>
               </div>
             </div>
