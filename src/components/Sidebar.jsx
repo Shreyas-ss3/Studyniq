@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // 👈 Imported the router navigation engine
 
 // ========================================================
 // 🔑 CONFIGURATION: FIXED WITH QUOTES
@@ -7,6 +8,8 @@ const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400
 // ========================================================
 
 export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTab }) {
+  const navigate = useNavigate(); // 👈 Initialized the navigator engine
+
   const primaryNav = [
     { id: 'dashboard', name: 'Home', icon: '🏠' },
     { id: 'subjects', name: 'My Subjects', icon: '📚' },
@@ -27,7 +30,6 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
   ];
 
   const handlePremiumCheckout = () => {
-    // Graceful routing wrapper
     window.location.href = STRIPE_PAYMENT_LINK;
   };
 
@@ -36,7 +38,13 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
       <div className="space-y-6">
         {/* Brand Header */}
         <div className="flex items-center gap-2 px-2">
-          <span className="text-2xl font-black text-indigo-600 tracking-tight">studyniq</span>
+          {/* 👈 Added cursor-pointer, transitions, and navigate('/') link target */}
+          <span 
+            onClick={() => navigate('/')} 
+            className="text-2xl font-black text-indigo-600 tracking-tight cursor-pointer hover:opacity-80 transition-opacity"
+          >
+            studyniq
+          </span>
         </div>
 
         {/* Primary Navigation System */}
