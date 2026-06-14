@@ -143,4 +143,4 @@ export default function Login({
               "studyniq has completely changed the way I study. It's like having everything I need in one single place!"
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h
+            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">J</div>
