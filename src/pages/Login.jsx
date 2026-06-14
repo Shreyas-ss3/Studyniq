@@ -52,7 +52,7 @@ export default function Login({
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Email address</label>
                 <input 
@@ -60,7 +60,7 @@ export default function Login({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email" 
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold bg-slate-50/50 focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold bg-slate-50/50 text-slate-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition-colors"
                   required
                 />
               </div>
@@ -86,7 +86,7 @@ export default function Login({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={mode === 'login' ? "Enter your password" : "Create a secure password"} 
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold bg-slate-50/50 text-slate-900 focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold bg-slate-50/50 text-slate-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500 transition-colors"
                   required
                 />            
               </div>
