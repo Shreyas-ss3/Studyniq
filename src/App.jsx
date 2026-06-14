@@ -165,13 +165,14 @@ function Dashboard({ user }) {
 
   return (
     <div className="antialiased min-h-screen flex bg-[#F8FAFC] text-gray-800">
-      <Sidebar 
-        user={user} 
-        streak={streak} 
-        onLogout={logout} 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-      />
+    <Sidebar 
+  user={user}
+  streak={streak}
+  activeTab={activeTab}
+  setActiveTab={setActiveTab}
+  onLogout={handleLogout}
+  onNavigateLanding={() => setForceShowLanding(true)} // 👈 Toggles layout conditionally if your router is local state-bound
+/>
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <Topbar user={user} streak={streak} />
