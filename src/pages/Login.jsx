@@ -86,9 +86,9 @@ export default function Login({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={mode === 'login' ? "Enter your password" : "Create a secure password"} 
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold bg-slate-50/50 focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-semibold bg-slate-50/50 text-slate-900 focus:outline-none focus:border-indigo-500 transition-colors"
                   required
-                />
+                />            
               </div>
 
               <button 
