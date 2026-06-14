@@ -23,12 +23,12 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
   ];
 
   const handlePremiumCheckout = () => {
-    if (STRIPE_PAYMENT_LINK.includes("YOUR_ACTUAL_COPIED_LINK_HERE")) {
-      alert("Please update the STRIPE_PAYMENT_LINK at the top of Sidebar.jsx!");
+    if (STRIPE_PAYMENT_LINK.includes("https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400")) {
+      alert("Please update the https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400 at the top of Sidebar.jsx!");
       return;
     }
     // Redirects perfectly to your Stripe hosted checkout
-    window.location.href = https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400;
+    window.location.href = "https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400";
   };
 
   return (
