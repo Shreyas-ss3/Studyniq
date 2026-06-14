@@ -102,14 +102,14 @@ export default function Home({ onNavigate }) {
             <h2 className="text-3xl font-black tracking-tight">Free while in beta testing</h2>
           </div>
           <div className="bg-white/5 border border-white/10 p-8 rounded-3xl max-w-sm mx-auto space-y-6">
-            <h3 className="font-bold text-lg">Beta Explorer</h3>
-            <div className="text-4xl font-black">$0 <span className="text-xs text-indigo-300 font-medium">/ forever</span></div>
+            <h3 className="font-bold text-lg">Studyniq</h3>
+            <div className="text-4xl font-black">$0 <span className="text-xs text-indigo-300 font-medium"></span></div>
             <p className="text-xs text-gray-400 font-medium leading-relaxed">Enjoy unconditional access to all revision structures, flashcards, timers, and metrics during early development.</p>
             <button 
               onClick={() => onNavigate('login')}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-3 rounded-xl transition-all"
             >
-              Join the Beta Profile
+              Join Studyniq now!
             </button>
           </div>
         </div>
