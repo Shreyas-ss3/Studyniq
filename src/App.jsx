@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import { auth } from "./firebase";
@@ -11,39 +11,24 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 
+// Component Structural Shells
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import FlashcardsSection from "./components/FlashcardsSection";
 
+// Beautiful New Mockup Views
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+
 import "./App.css";
 
-/* ---------------- HOME ---------------- */
-function Home() {
-  const nav = useNavigate();
-
-  return (
-    <div className="h-screen flex items-center justify-center bg-[#F8FAFC] text-gray-800">
-      <div className="bg-white border border-gray-100 p-10 rounded-2xl text-center w-[380px] shadow-xl shadow-indigo-100/40">
-        <h1 className="text-4xl font-extrabold mb-2 text-indigo-600 tracking-tight">studyniq</h1>
-        <p className="text-gray-500 mb-6 font-medium">Learn smarter. Achieve more.</p>
-        <button
-          onClick={() => nav("/login")}
-          className="bg-indigo-600 hover:bg-indigo-700 font-semibold text-white px-5 py-2.5 rounded-xl w-full transition-colors shadow-sm"
-        >
-          Get Started
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------- LOGIN ---------------- */
-function Login() {
+/* ---------------- AUTH WRAPPER (LOGIN SCREEN CONTAINER) ---------------- */
+function LoginWrapper() {
   const nav = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const login = async () => {
+  const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       nav("/app");
@@ -52,7 +37,7 @@ function Login() {
     }
   };
 
-  const signup = async () => {
+  const handleSignup = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       nav("/app");
@@ -61,7 +46,7 @@ function Login() {
     }
   };
 
-  const googleLogin = async () => {
+  const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -72,45 +57,22 @@ function Login() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-[#F8FAFC] text-gray-800">
-      <div className="bg-white border border-gray-100 p-8 rounded-2xl w-[350px] shadow-xl shadow-indigo-100/30">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome back</h2>
-        <input
-          className="w-full p-3 mb-2.5 bg-gray-50 border border-gray-200 text-sm rounded-xl focus:outline-none focus:border-indigo-500"
-          placeholder="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          className="w-full p-3 mb-4 bg-gray-50 border border-gray-200 text-sm rounded-xl focus:outline-none focus:border-indigo-500"
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button onClick={login} className="w-full bg-indigo-600 text-white font-semibold py-2.5 rounded-xl mb-2 hover:bg-indigo-700 shadow-sm">
-          Login
-        </button>
-        <button onClick={signup} className="w-full bg-gray-100 text-gray-700 font-semibold py-2.5 rounded-xl mb-3 hover:bg-gray-200">
-          Sign Up
-        </button>
-        <div className="relative flex py-2 items-center mb-3">
-          <div className="flex-grow border-t border-gray-200"></div>
-          <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase font-bold">Or</span>
-          <div className="flex-grow border-t border-gray-200"></div>
-        </div>
-        <button onClick={googleLogin} className="w-full bg-white border border-gray-200 text-gray-700 font-medium py-2.5 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50">
-          <span>🌐</span> Continue with Google
-        </button>
-      </div>
-    </div>
+    <Login 
+      email={email}
+      setEmail={setEmail}
+      password={password}
+      setPassword={setPassword}
+      onLogin={handleLogin}
+      onSignup={handleSignup}
+      onGoogleLogin={handleGoogleLogin}
+      onNavigate={(destination) => nav(destination === 'home' ? '/' : `/${destination}`)}
+    />
   );
 }
 
-/* ---------------- DASHBOARD ---------------- */
+/* ---------------- WORKSPACE CORE DASHBOARD ---------------- */
 function Dashboard({ user }) {
   const nav = useNavigate();
-
   const [activeTab, setActiveTab] = useState('dashboard');
   
   // Real working data synchronization hooks
@@ -363,6 +325,7 @@ function Dashboard({ user }) {
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const nav = useNavigate();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
@@ -382,9 +345,15 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/app" element={<Dashboard user={user} />} />
+      {/* Dynamic landing layouts */}
+      <Route path="/" element={<Home onNavigate={(dest) => nav(dest === 'login' ? '/login' : '/')} />} />
+      <Route path="/login" element={<LoginWrapper />} />
+      
+      {/* Authenticated workspace protected router block */}
+      <Route 
+        path="/app" 
+        element={user ? <Dashboard user={user} /> : <Navigate to="/login" replace />} 
+      />
     </Routes>
   );
 }
