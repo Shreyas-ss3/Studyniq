@@ -8,9 +8,9 @@ export default function Login({
   onLogin, 
   onSignup, 
   onGoogleLogin, 
+  onForgotPassword, // <- Accept the new prop here
   onNavigate 
 }) {
-  // Local state to toggle between 'login' and 'signup' mode
   const [mode, setMode] = useState('login');
 
   const handleSubmit = (e) => {
@@ -68,7 +68,13 @@ export default function Login({
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Password</label>
                   {mode === 'login' && (
-                    <a href="#forgot" className="text-xs font-bold text-indigo-600 hover:underline">Forgot password?</a>
+                    <button 
+                      type="button"
+                      onClick={onForgotPassword} // <- Attach function here
+                      className="text-xs font-bold text-indigo-600 hover:underline bg-none border-none cursor-pointer"
+                    >
+                      Forgot password?
+                    </button>
                   )}
                 </div>
                 <input 
@@ -112,7 +118,7 @@ export default function Login({
           </div>
         </div>
 
-        {/* Right Info and Testimonials Side Banner */}
+        {/* Right Info side panel */}
         <div className="md:col-span-6 bg-slate-50 border-l border-gray-100 p-10 flex flex-col justify-between relative overflow-hidden">
           <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm max-w-sm space-y-4">
             <h3 className="font-black text-sm text-gray-800">
@@ -130,9 +136,9 @@ export default function Login({
               "studyniq has completely changed the way I study. It's like having everything I need in one single place!"
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">S</div>
+              <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">J</div>
               <div>
-                <h4 className="text-xs font-bold">Shreyas</h4>
+                <h4 className="text-xs font-bold">Jessica</h4>
                 <p className="text-[10px] text-indigo-200">Year 11 Student</p>
               </div>
             </div>

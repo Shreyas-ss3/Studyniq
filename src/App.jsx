@@ -9,6 +9,7 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 // Component Structural Shells
@@ -51,6 +52,19 @@ function LoginWrapper() {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       nav("/app");
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      alert("Please enter your email address first so we know where to send the reset link!");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert(`Password reset link has been sent to ${email}! Check your inbox.`);
     } catch (e) {
       alert(e.message);
     }
