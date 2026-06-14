@@ -3,7 +3,6 @@ import React from 'react';
 export default function Topbar({ user, streak }) {
   return (
     <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8">
-      {/* Search Input Mockup */}
       <div className="relative w-80">
         <input
           type="text"
@@ -13,7 +12,6 @@ export default function Topbar({ user, streak }) {
         <kbd className="absolute right-3 top-2.5 text-[10px] text-gray-400 border px-1.5 py-0.5 rounded-md bg-white">⌘K</kbd>
       </div>
 
-      {/* Profile Details and Quick Stats */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
           <span>🔥</span>
