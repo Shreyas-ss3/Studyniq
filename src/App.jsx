@@ -144,10 +144,6 @@ function Dashboard({ user }) {
       setStreak(savedStreak);
     }
 
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) setTheme(savedTheme);
-  }, [user]);
-
   /* SAVE TASKS */
   useEffect(() => {
     if (user) {
