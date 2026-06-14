@@ -95,7 +95,7 @@ function Dashboard({ user }) {
   const [task, setTask] = useState("");
   const [time, setTime] = useState(1500);
   const [running, setRunning] = useState(false);
-  const [streak, setStreak] = useState(7); // Default mock display matching spec blueprint images
+  const [streak, setStreak] = useState(7); 
 
   const key = user ? `tasks_${user.uid}` : null;
   const streakKey = user ? `streak_${user.uid}` : null;
@@ -165,7 +165,6 @@ function Dashboard({ user }) {
 
   return (
     <div className="antialiased min-h-screen flex bg-[#F8FAFC] text-gray-800">
-      {/* 🛠️ FIXED: corrected onLogout reference, and pointed the landing redirect straight to nav('/') */}
       <Sidebar 
         user={user}
         streak={streak}
@@ -352,6 +351,7 @@ export default function App() {
     return () => unsub();
   }, []);
 
+  // 🛡️ CRITICAL FIX: Halts router evaluation entirely until Firebase finishes loading the active session state
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center bg-[#F8FAFC] text-indigo-600 font-semibold text-sm">
@@ -362,16 +362,20 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Dynamic landing layouts */}
-      <Route path="/" element={<Home onNavigate={(dest) => nav(dest === 'login' ? '/login' : '/')} />} />
-      <Route path="/login" element={<LoginWrapper />} />
+      {/* 🚀 FIXED: Dynamic onboarding routing logic that respects real-time session statuses */}
+      <Route 
+        path="/" 
+        element={user ? <Navigate to="/app" replace /> : <Home onNavigate={(dest) => nav(dest === 'login' ? '/login' : '/')} />} 
+      />
+      <Route 
+        path="/login" 
+        element={user ? <Navigate to="/app" replace /> : <LoginWrapper />} 
+      />
       
-      {/* Authenticated workspace protected router block */}
+      {/* Protected application router scope */}
       <Route 
         path="/app" 
         element={user ? <Dashboard user={user} /> : <Navigate to="/login" replace />} 
-        // 💡 Note: If you want clicking the sidebar logo to show the homepage while logged in,
-        // we keep the auth-guard active here, and use the custom layout hook inside Sidebar!
       />
     </Routes>
   );
