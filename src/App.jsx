@@ -17,6 +17,21 @@ import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import FlashcardsSection from "./components/FlashcardsSection";
 
+// Connected Sub-Module Mockup Views
+import {
+  SubjectsView,
+  StudyPlanView,
+  QuizzesView,
+  PastPapersView,
+  ExamPracticeView,
+  AiTutorView,
+  NotesView,
+  LeaderboardView,
+  AchievementsView,
+  StudyGroupsView,
+  ProgressView
+} from "./components/ModuleViews";
+
 // Beautiful New Mockup Views
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -320,7 +335,19 @@ function Dashboard({ user }) {
               </>
             )}
 
+            {/* Dynamic Active Sub-module Subviews */}
             {activeTab === 'flashcards' && <FlashcardsSection user={user} />}
+            {activeTab === 'subjects' && <SubjectsView />}
+            {activeTab === 'plan' && <StudyPlanView />}
+            {activeTab === 'quizzes' && <QuizzesView />}
+            {activeTab === 'papers' && <PastPapersView />}
+            {activeTab === 'practice' && <ExamPracticeView />}
+            {activeTab === 'ai-tutor' && <AiTutorView />}
+            {activeTab === 'notes' && <NotesView />}
+            {activeTab === 'leaderboard' && <LeaderboardView />}
+            {activeTab === 'achievements' && <AchievementsView />}
+            {activeTab === 'groups' && <StudyGroupsView />}
+            {activeTab === 'progress' && <ProgressView />}
             
             {/* Account Settings Layout view */}
             {activeTab === 'settings' && (
@@ -353,8 +380,8 @@ function Dashboard({ user }) {
               </div>
             )}
             
-            {/* Dynamic Module Fallback View Shell */}
-            {activeTab !== 'dashboard' && activeTab !== 'flashcards' && activeTab !== 'settings' && (
+            {/* Catch-all Layout Boundary Check for Dev Safetynet */}
+            {!['dashboard', 'flashcards', 'subjects', 'plan', 'quizzes', 'papers', 'practice', 'ai-tutor', 'notes', 'leaderboard', 'achievements', 'groups', 'progress', 'settings'].includes(activeTab) && (
               <div className="bg-white text-gray-800 border border-gray-100 p-12 rounded-3xl text-center text-gray-400 font-medium text-sm">
                 <p>The workspace container view for the "{activeTab}" module is ready to accept custom layouts.</p>
               </div>
