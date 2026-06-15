@@ -9,6 +9,7 @@ const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_7sY9AT18a1nX2p68wZ7g400
 // 💡 Added 'onNavigateLanding' prop to bypass standard auth-routing guards when requested
 export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTab, onNavigateLanding }) {
 
+  // 🎯 Removed 'progress' from this array to eliminate the duplicate view conflict
   const primaryNav = [
     { id: 'dashboard', name: 'Home', icon: '🏠' },
     { id: 'subjects', name: 'My Subjects', icon: '📚' },
@@ -19,7 +20,6 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
     { id: 'practice', name: 'Exam Practice', icon: '✍️' },
     { id: 'ai-tutor', name: 'AI Tutor', icon: '🤖', badge: 'NEW' },
     { id: 'notes', name: 'Notes', icon: '📝' },
-    { id: 'progress', name: 'Progress', icon: '📈' },
   ];
 
   const socialNav = [
@@ -92,8 +92,8 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
         </div>
       </div>
 
-      {/* Premium Conversion Card & Sign Out footer */}
-      <div className="pt-6 space-y-4">
+      {/* Premium Conversion Card (Duplicate Sign Out removed from here) */}
+      <div className="pt-6">
         <div className="bg-gradient-to-br from-indigo-50/60 to-purple-50/60 border border-indigo-100/40 p-4 rounded-2xl">
           <h4 className="font-bold text-sm text-indigo-900 mb-0.5">Unlock your potential</h4>
           <p className="text-xs text-indigo-600/80 font-medium mb-3 leading-relaxed">
@@ -107,14 +107,6 @@ export default function Sidebar({ user, streak, onLogout, activeTab, setActiveTa
             Go Premium • £2.99
           </button>
         </div>
-
-        <button
-          type="button"
-          onClick={onLogout}
-          className="w-full text-left px-3 py-2 text-gray-400 hover:text-red-500 text-xs font-bold transition-colors"
-        >
-          🚪 Sign Out Account
-        </button>
       </div>
     </aside>
   );
