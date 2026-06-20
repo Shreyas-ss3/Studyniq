@@ -46,26 +46,54 @@ export default function FlashcardsSection() {
       return; 
     }
 
-    // Unlimited Personal Local Save Pipeline
-    const updatedDb = database.map((sub) => {
-      if (sub.id === selectedSubjectId) {
-        return {
-          ...sub,
-          topics: [
-            ...sub.topics,
-            {
-              id: `custom-${Date.now()}`,
-              title: newTopicTitle,
-              cardCount: creationCards.length,
-              updated: "Created just now",
-              isPremiumShared: false,
-              cards: creationCards
-            }
-          ]
-        };
-      }
-      return sub;
-    });
+    let updatedDb = [...database];
+
+    if (selectedSubjectId === "custom-subject") {
+      // Prompt user for custom subject name input
+      const userSubjectName = prompt("Enter your custom subject name:")?.trim();
+      if (!userSubjectName) return alert("Custom subject name is required!");
+
+      const newSubjectId = `custom-sub-${Date.now()}`;
+
+      // Insert an entirely new subject block schema to the app flow
+      updatedDb.push({
+        id: newSubjectId,
+        subject: userSubjectName,
+        icon: "📝",
+        badgeBg: "bg-gray-50 text-gray-700 border-gray-100",
+        topics: [
+          {
+            id: `custom-topic-${Date.now()}`,
+            title: newTopicTitle,
+            cardCount: creationCards.length,
+            updated: "Created just now",
+            isPremiumShared: false,
+            cards: creationCards
+          }
+        ]
+      });
+    } else {
+      // Standard Local Pipeline map for preexisting list values
+      updatedDb = database.map((sub) => {
+        if (sub.id === selectedSubjectId) {
+          return {
+            ...sub,
+            topics: [
+              ...sub.topics,
+              {
+                id: `custom-${Date.now()}`,
+                title: newTopicTitle,
+                cardCount: creationCards.length,
+                updated: "Created just now",
+                isPremiumShared: false,
+                cards: creationCards
+              }
+            ]
+          };
+        }
+        return sub;
+      });
+    }
 
     setDatabase(updatedDb);
     setIsCreating(false);
@@ -153,6 +181,7 @@ export default function FlashcardsSection() {
                 {database.map((sub) => (
                   <option key={sub.id} value={sub.id}>{sub.subject} {sub.icon}</option>
                 ))}
+                <option value="custom-subject">✏️ Custom Subject...</option>
               </select>
             </div>
 
