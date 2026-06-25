@@ -1,16 +1,16 @@
 {
-  "name": "studyniq",
+  "name": "focusforge",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --target esnext",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "22.x"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.7.0",

@@ -1,32 +1,25 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  
-  // Forces Vite/Rolldown to strictly isolate the browser build parameters
   build: {
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'index.html'),
-      },
-      // Safely flag all Node backend frameworks as fully external
+      // Prevents Rolldown from choking on your backend Node libraries
       external: [
         'express',
         'cors',
         'dotenv',
         'stripe',
-        '@stripe/stripe-js'
+        'path',
+        'fs'
       ]
     }
   },
-
-  // Completely shields backend dependency trees from pre-bundler crawling
   optimizeDeps: {
-    entries: ['index.html'],
+    // Keeps Vite's crawl tool focused exclusively on frontend targets
     exclude: ['express', 'cors', 'dotenv', 'stripe']
   }
 });
