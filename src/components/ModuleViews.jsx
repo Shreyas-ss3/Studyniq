@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from "react";
 
 // 📚 MY SUBJECTS VIEW
 export function SubjectsView() {
@@ -136,25 +136,139 @@ export function ExamPracticeView() {
 }
 
 // 🤖 AI TUTOR VIEW
+import React, { useState } from "react";
+
 export function AiTutorView() {
+  const [question, setQuestion] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      content:
+        "Hello! I am your StudyNiq AI Tutor. Ask me anything about your subjects and I'll help explain it."
+    }
+  ]);
+  const [loading, setLoading] = useState(false);
+
+  const sendMessage = async () => {
+    if (!question.trim()) return;
+
+    const userMessage = {
+      role: "user",
+      content: question
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setQuestion("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are StudyNiq AI Tutor. Explain concepts clearly for secondary school and GCSE students."
+              },
+              ...messages,
+              userMessage
+            ]
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      const aiReply = {
+        role: "assistant",
+        content:
+          data?.choices?.[0]?.message?.content ||
+          "Sorry, I couldn't generate a response."
+      };
+
+      setMessages((prev) => [...prev, aiReply]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content:
+            "Error connecting to Groq. Check your API key and internet connection."
+        }
+      ]);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="space-y-6 flex flex-col h-[calc(100vh-220px)]">
       <div>
         <h2 className="text-xl font-bold text-gray-900">AI Tutor Chat</h2>
-        <p className="text-xs text-gray-400 mt-1">Ask questions, simplify jargon, or review textbook core logic.</p>
+        <p className="text-xs text-gray-400 mt-1">
+          Ask questions, simplify jargon, or review textbook concepts.
+        </p>
       </div>
-      <div className="bg-white border border-gray-100 rounded-3xl flex-1 p-6 shadow-sm flex flex-col justify-between overflow-hidden">
+
+      <div className="bg-white border border-gray-100 rounded-3xl flex-1 p-6 shadow-sm flex flex-col overflow-hidden">
         <div className="space-y-4 overflow-y-auto flex-1 pr-1 pb-4">
-          <div className="flex gap-3 max-w-xl">
-            <div className="w-7 h-7 bg-indigo-100 text-indigo-600 text-xs rounded-xl flex items-center justify-center font-bold shrink-0">🤖</div>
-            <div className="bg-gray-50 border border-gray-100 p-3 rounded-2xl rounded-tl-none text-xs font-medium text-gray-700 leading-relaxed">
-              Hello! I am your interactive **studyniq** AI companion. Drop a question below to explain any confusing textbook concepts!
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex gap-3 ${
+                msg.role === "user" ? "justify-end" : ""
+              }`}
+            >
+              {msg.role === "assistant" && (
+                <div className="w-7 h-7 bg-indigo-100 text-indigo-600 text-xs rounded-xl flex items-center justify-center font-bold shrink-0">
+                  🤖
+                </div>
+              )}
+
+              <div
+                className={`p-3 rounded-2xl text-xs font-medium leading-relaxed max-w-[80%]
+                ${
+                  msg.role === "user"
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-50 border border-gray-100 text-gray-700"
+                }`}
+              >
+                {msg.content}
+              </div>
             </div>
-          </div>
+          ))}
+
+          {loading && (
+            <div className="text-xs text-gray-400">
+              AI is thinking...
+            </div>
+          )}
         </div>
+
         <div className="flex gap-2 pt-4 border-t border-gray-50">
-          <input placeholder="Ask a question..." className="flex-1 p-3 text-xs bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:border-indigo-500 font-medium" />
-          <button className="bg-indigo-600 text-white px-4 text-xs font-bold rounded-xl hover:bg-indigo-700 transition-colors">Send</button>
+          <input
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            placeholder="Ask a question..."
+            className="flex-1 p-3 text-xs bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:border-indigo-500 font-medium"
+          />
+
+          <button
+            onClick={sendMessage}
+            disabled={loading}
+            className="bg-indigo-600 text-white px-4 text-xs font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
+          >
+            Send
+          </button>
         </div>
       </div>
     </div>
