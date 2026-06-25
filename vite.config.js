@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -7,19 +8,29 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      // Prevents Rolldown from choking on your backend Node libraries
+      // Force the builder to only optimize the React frontend entry point
+      input: {
+        main: resolve(__dirname, 'index.html'),
+      },
+      // Completely shield the browser bundler from reading server architecture
       external: [
         'express',
         'cors',
         'dotenv',
         'stripe',
+        '@stripe/stripe-js',
+        'firebase',
+        'firebase/app',
+        'firebase/auth',
+        'firebase/firestore',
         'path',
         'fs'
       ]
     }
   },
   optimizeDeps: {
-    // Keeps Vite's crawl tool focused exclusively on frontend targets
+    // Blocks Vite from looking at non-frontend dependencies in your package.json
+    disabled: true,
     exclude: ['express', 'cors', 'dotenv', 'stripe']
   }
 });
