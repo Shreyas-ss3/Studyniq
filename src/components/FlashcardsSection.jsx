@@ -22,6 +22,10 @@ export default function FlashcardsSection() {
   const [completedCycles, setCompletedCycles] = useState(0);
   const [showTimerSetup, setShowTimerSetup] = useState(false);
 
+  // Custom Time Manual Input States
+  const [customFocusMins, setCustomFocusMins] = useState("");
+  const [customBreakMins, setCustomBreakMins] = useState("");
+
   // Custom Application Notification Toast State
   const [notification, setNotification] = useState({ show: false, title: "", message: "", type: "info" });
 
@@ -83,13 +87,18 @@ export default function FlashcardsSection() {
   };
 
   const handleSetCustomTimer = (minutes, mode = "focus") => {
+    const parsedMins = parseInt(minutes, 10);
+    if (isNaN(parsedMins) || parsedMins <= 0) {
+      return triggerNotification("⚠️ Invalid Time", "Please specify a positive number of minutes.", "error");
+    }
+    
     setTimerMode(mode);
-    setTimerSeconds(minutes * 60);
+    setTimerSeconds(parsedMins * 60);
     setIsTimerRunning(false);
     setShowTimerSetup(false);
     triggerNotification(
       "⏱️ Timer Updated", 
-      `Configured a new ${minutes}-minute ${mode} session block.`, 
+      `Configured a new ${parsedMins}-minute ${mode} session block.`, 
       "info"
     );
   };
@@ -310,18 +319,57 @@ export default function FlashcardsSection() {
             ⚙️
           </button>
 
-          {/* TIMER SELECTION DROPDOWN POPUP */}
+          {/* TIMER SELECTION DROPDOWN POPUP WITH CUSTOM TIME FIELDS */}
           {showTimerSetup && (
-            <div className="absolute top-full mt-2 right-0 bg-white border border-gray-100 shadow-xl rounded-2xl p-3 z-30 min-w-[210px] space-y-2 animate-in fade-in zoom-in-95 duration-100">
-              <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider px-1">Set Focus Duration</h4>
-              <div className="grid grid-cols-2 gap-1.5">
-                <button onClick={() => handleSetCustomTimer(25, "focus")} className="py-1.5 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🎯 25 Mins</button>
-                <button onClick={() => handleSetCustomTimer(50, "focus")} className="py-1.5 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🚀 50 Mins</button>
+            <div className="absolute top-full mt-2 right-0 bg-white border border-gray-100 shadow-xl rounded-2xl p-4 z-30 min-w-[240px] space-y-3 animate-in fade-in zoom-in-95 duration-100">
+              {/* Focus Config */}
+              <div className="space-y-1.5">
+                <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider px-1">Focus Duration</h4>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button onClick={() => handleSetCustomTimer(25, "focus")} className="py-1 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🎯 25m</button>
+                  <button onClick={() => handleSetCustomTimer(50, "focus")} className="py-1 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🚀 50m</button>
+                </div>
+                <div className="flex gap-1 pt-0.5">
+                  <input 
+                    type="number" 
+                    placeholder="Custom mins..." 
+                    value={customFocusMins}
+                    onChange={(e) => setCustomFocusMins(e.target.value)}
+                    className="w-full text-[10px] p-1.5 bg-gray-50 border border-gray-100 rounded-lg outline-none focus:border-indigo-500 text-gray-700"
+                  />
+                  <button 
+                    onClick={() => { handleSetCustomTimer(customFocusMins, "focus"); setCustomFocusMins(""); }}
+                    className="bg-indigo-600 text-white text-[10px] px-2.5 font-bold rounded-lg hover:bg-indigo-700"
+                  >
+                    Set
+                  </button>
+                </div>
               </div>
-              <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider pt-1 px-1">Set Break Duration</h4>
-              <div className="grid grid-cols-2 gap-1.5">
-                <button onClick={() => handleSetCustomTimer(5, "break")} className="py-1.5 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-600 text-[10px] font-bold rounded-lg transition-colors">☕ 5 Mins</button>
-                <button onClick={() => handleSetCustomTimer(15, "break")} className="py-1.5 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-600 text-[10px] font-bold rounded-lg transition-colors">🌴 15 Mins</button>
+
+              <hr className="border-gray-100" />
+
+              {/* Break Config */}
+              <div className="space-y-1.5">
+                <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider px-1">Break Duration</h4>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button onClick={() => handleSetCustomTimer(5, "break")} className="py-1 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-600 text-[10px] font-bold rounded-lg transition-colors">☕ 5m</button>
+                  <button onClick={() => handleSetCustomTimer(15, "break")} className="py-1 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-600 text-[10px] font-bold rounded-lg transition-colors">🌴 15m</button>
+                </div>
+                <div className="flex gap-1 pt-0.5">
+                  <input 
+                    type="number" 
+                    placeholder="Custom mins..." 
+                    value={customBreakMins}
+                    onChange={(e) => setCustomBreakMins(e.target.value)}
+                    className="w-full text-[10px] p-1.5 bg-gray-50 border border-gray-100 rounded-lg outline-none focus:border-emerald-500 text-gray-700"
+                  />
+                  <button 
+                    onClick={() => { handleSetCustomTimer(customBreakMins, "break"); setCustomBreakMins(""); }}
+                    className="bg-emerald-600 text-white text-[10px] px-2.5 font-bold rounded-lg hover:bg-emerald-700"
+                  >
+                    Set
+                  </button>
+                </div>
               </div>
             </div>
           )}
