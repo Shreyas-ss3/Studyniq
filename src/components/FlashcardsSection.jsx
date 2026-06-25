@@ -15,16 +15,14 @@ export default function FlashcardsSection() {
   const [totalReviewed, setTotalReviewed] = useState(0);
   const [masteryRate, setMasteryRate] = useState(85);
 
-  // Advanced Pomodoro Cycle Engine States
+  // Focus Timer Engine States
   const [timerSeconds, setTimerSeconds] = useState(1500); // Default 25 Mins (1500s)
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [timerMode, setTimerMode] = useState("focus"); // 'focus' or 'break'
   const [completedCycles, setCompletedCycles] = useState(0);
   const [showTimerSetup, setShowTimerSetup] = useState(false);
 
-  // Custom Time Manual Input States
+  // Custom Time Manual Input State
   const [customFocusMins, setCustomFocusMins] = useState("");
-  const [customBreakMins, setCustomBreakMins] = useState("");
 
   // Custom Application Notification Toast State
   const [notification, setNotification] = useState({ show: false, title: "", message: "", type: "info" });
@@ -47,7 +45,7 @@ export default function FlashcardsSection() {
     }, 4500);
   };
 
-  // Pomodoro Interval Logic Loop
+  // Focus Timer Logic Loop
   useEffect(() => {
     let interval = null;
     if (isTimerRunning && timerSeconds > 0) {
@@ -56,29 +54,17 @@ export default function FlashcardsSection() {
       }, 1000);
     } else if (timerSeconds === 0) {
       setIsTimerRunning(false);
-      
-      if (timerMode === "focus") {
-        const nextCycleCount = completedCycles + 1;
-        setCompletedCycles(nextCycleCount);
-        setTimerMode("break");
-        setTimerSeconds(300); // 5 Minute Break
-        triggerNotification(
-          "💪 Focus Block Complete!", 
-          `Great job! You finished block #${nextCycleCount}. Time for a 5-minute brain break.`, 
-          "success"
-        );
-      } else {
-        setTimerMode("focus");
-        setTimerSeconds(1500); // 25 Minute Focus
-        triggerNotification(
-          "⚡ Break Time Over", 
-          "Your 5 minutes are up. Let's get back into the focus zone!", 
-          "info"
-        );
-      }
+      const nextCycleCount = completedCycles + 1;
+      setCompletedCycles(nextCycleCount);
+      setTimerSeconds(1500); // Reset to default 25 mins
+      triggerNotification(
+        "💪 Focus Block Complete!", 
+        `Great job! You finished study block #${nextCycleCount}. Resetting to next session.`, 
+        "success"
+      );
     }
     return () => clearInterval(interval);
-  }, [isTimerRunning, timerSeconds, timerMode, completedCycles]);
+  }, [isTimerRunning, timerSeconds, completedCycles]);
 
   const formatTimer = () => {
     const mins = Math.floor(timerSeconds / 60);
@@ -86,19 +72,18 @@ export default function FlashcardsSection() {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleSetCustomTimer = (minutes, mode = "focus") => {
+  const handleSetCustomTimer = (minutes) => {
     const parsedMins = parseInt(minutes, 10);
     if (isNaN(parsedMins) || parsedMins <= 0) {
       return triggerNotification("⚠️ Invalid Time", "Please specify a positive number of minutes.", "error");
     }
     
-    setTimerMode(mode);
     setTimerSeconds(parsedMins * 60);
     setIsTimerRunning(false);
     setShowTimerSetup(false);
     triggerNotification(
       "⏱️ Timer Updated", 
-      `Configured a new ${parsedMins}-minute ${mode} session block.`, 
+      `Configured a new ${parsedMins}-minute focus session block.`, 
       "info"
     );
   };
@@ -293,11 +278,11 @@ export default function FlashcardsSection() {
           <p className="text-xs font-medium text-gray-400">Personal study decks are completely unlimited. Go Premium to publish decks globally.</p>
         </div>
 
-        {/* POMODORO CONTROLLER LOGIC HUB */}
+        {/* FOCUS TIMER CONTROLLER HUB */}
         <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 p-2 px-3.5 rounded-2xl relative">
           <div className="text-left">
-            <span className={`text-[8px] font-black uppercase tracking-widest block ${timerMode === 'break' ? 'text-emerald-500 animate-pulse' : 'text-indigo-500'}`}>
-              {timerMode === "focus" ? `Focus Block #${completedCycles + 1}` : "☕ Break Interval"}
+            <span className="text-[8px] font-black uppercase tracking-widest block text-indigo-500">
+              Focus Block #{completedCycles + 1}
             </span>
             <span className="text-xs font-mono font-black text-gray-800">{formatTimer()}</span>
           </div>
@@ -319,15 +304,14 @@ export default function FlashcardsSection() {
             ⚙️
           </button>
 
-          {/* TIMER SELECTION DROPDOWN POPUP WITH CUSTOM TIME FIELDS */}
+          {/* TIMER SELECTION DROPDOWN POPUP */}
           {showTimerSetup && (
-            <div className="absolute top-full mt-2 right-0 bg-white border border-gray-100 shadow-xl rounded-2xl p-4 z-30 min-w-[240px] space-y-3 animate-in fade-in zoom-in-95 duration-100">
-              {/* Focus Config */}
+            <div className="absolute top-full mt-2 right-0 bg-white border border-gray-100 shadow-xl rounded-2xl p-4 z-30 min-w-[200px] space-y-3 animate-in fade-in zoom-in-95 duration-100">
               <div className="space-y-1.5">
                 <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider px-1">Focus Duration</h4>
                 <div className="grid grid-cols-2 gap-1.5">
-                  <button onClick={() => handleSetCustomTimer(25, "focus")} className="py-1 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🎯 25m</button>
-                  <button onClick={() => handleSetCustomTimer(50, "focus")} className="py-1 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🚀 50m</button>
+                  <button onClick={() => handleSetCustomTimer(25)} className="py-1 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🎯 25m</button>
+                  <button onClick={() => handleSetCustomTimer(50)} className="py-1 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🚀 50m</button>
                 </div>
                 <div className="flex gap-1 pt-0.5">
                   <input 
@@ -338,34 +322,8 @@ export default function FlashcardsSection() {
                     className="w-full text-[10px] p-1.5 bg-gray-50 border border-gray-100 rounded-lg outline-none focus:border-indigo-500 text-gray-700"
                   />
                   <button 
-                    onClick={() => { handleSetCustomTimer(customFocusMins, "focus"); setCustomFocusMins(""); }}
+                    onClick={() => { handleSetCustomTimer(customFocusMins); setCustomFocusMins(""); }}
                     className="bg-indigo-600 text-white text-[10px] px-2.5 font-bold rounded-lg hover:bg-indigo-700"
-                  >
-                    Set
-                  </button>
-                </div>
-              </div>
-
-              <hr className="border-gray-100" />
-
-              {/* Break Config */}
-              <div className="space-y-1.5">
-                <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider px-1">Break Duration</h4>
-                <div className="grid grid-cols-2 gap-1.5">
-                  <button onClick={() => handleSetCustomTimer(5, "break")} className="py-1 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-600 text-[10px] font-bold rounded-lg transition-colors">☕ 5m</button>
-                  <button onClick={() => handleSetCustomTimer(15, "break")} className="py-1 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-600 text-[10px] font-bold rounded-lg transition-colors">🌴 15m</button>
-                </div>
-                <div className="flex gap-1 pt-0.5">
-                  <input 
-                    type="number" 
-                    placeholder="Custom mins..." 
-                    value={customBreakMins}
-                    onChange={(e) => setCustomBreakMins(e.target.value)}
-                    className="w-full text-[10px] p-1.5 bg-gray-50 border border-gray-100 rounded-lg outline-none focus:border-emerald-500 text-gray-700"
-                  />
-                  <button 
-                    onClick={() => { handleSetCustomTimer(customBreakMins, "break"); setCustomBreakMins(""); }}
-                    className="bg-emerald-600 text-white text-[10px] px-2.5 font-bold rounded-lg hover:bg-emerald-700"
                   >
                     Set
                   </button>
