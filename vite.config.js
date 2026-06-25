@@ -3,17 +3,19 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  optimizeDeps: {
+    // Prevents Rolldown from scanning backend tools during initial module scanning
+    exclude: ['express', 'cors', 'dotenv', 'stripe']
+  },
   build: {
-    rollupOptions: {
-      // This forces the bundler to ignore backend modules that break in the browser
+    rolldownOptions: {
+      // Hard externalizes node specific modules from production browser bundles
       external: [
         'express',
         'cors',
         'dotenv',
         'stripe',
-        'firebase/app',
-        'firebase/auth',
-        'firebase/firestore'
+        /^node:.*/ // Ignores any core node bindings
       ]
     }
   }
