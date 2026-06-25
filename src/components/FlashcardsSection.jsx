@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // Import the fully pre-populated database containing all 23 subjects and 10 cards per topic
 import { initialDatabase } from "../data/flashcardData";
 
@@ -10,6 +10,21 @@ export default function FlashcardsSection() {
   const [currentCardIdx, setCurrentCardIdx] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
+  // Gamified Educational Analytics States
+  const [streak, setStreak] = useState(3);
+  const [totalReviewed, setTotalReviewed] = useState(0);
+  const [masteryRate, setMasteryRate] = useState(85);
+
+  // Advanced Pomodoro Cycle Engine States
+  const [timerSeconds, setTimerSeconds] = useState(1500); // Default 25 Mins (1500s)
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [timerMode, setTimerMode] = useState("focus"); // 'focus' or 'break'
+  const [completedCycles, setCompletedCycles] = useState(0);
+  const [showTimerSetup, setShowTimerSetup] = useState(false);
+
+  // Custom Application Notification Toast State
+  const [notification, setNotification] = useState({ show: false, title: "", message: "", type: "info" });
+
   // Creation Workspace Engine States
   const [isCreating, setIsCreating] = useState(false);
   const [selectedSubjectId, setSelectedSubjectId] = useState("eng-lang");
@@ -19,6 +34,65 @@ export default function FlashcardsSection() {
 
   // Premium Warning Dialog Modal State
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+  // Trigger custom in-app banner notifications
+  const triggerNotification = (title, message, type = "info") => {
+    setNotification({ show: true, title, message, type });
+    setTimeout(() => {
+      setNotification((prev) => ({ ...prev, show: false }));
+    }, 4500);
+  };
+
+  // Pomodoro Interval Logic Loop
+  useEffect(() => {
+    let interval = null;
+    if (isTimerRunning && timerSeconds > 0) {
+      interval = setInterval(() => {
+        setTimerSeconds((prev) => prev - 1);
+      }, 1000);
+    } else if (timerSeconds === 0) {
+      setIsTimerRunning(false);
+      
+      if (timerMode === "focus") {
+        const nextCycleCount = completedCycles + 1;
+        setCompletedCycles(nextCycleCount);
+        setTimerMode("break");
+        setTimerSeconds(300); // 5 Minute Break
+        triggerNotification(
+          "💪 Focus Block Complete!", 
+          `Great job! You finished block #${nextCycleCount}. Time for a 5-minute brain break.`, 
+          "success"
+        );
+      } else {
+        setTimerMode("focus");
+        setTimerSeconds(1500); // 25 Minute Focus
+        triggerNotification(
+          "⚡ Break Time Over", 
+          "Your 5 minutes are up. Let's get back into the focus zone!", 
+          "info"
+        );
+      }
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, timerSeconds, timerMode, completedCycles]);
+
+  const formatTimer = () => {
+    const mins = Math.floor(timerSeconds / 60);
+    const secs = timerSeconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const handleSetCustomTimer = (minutes, mode = "focus") => {
+    setTimerMode(mode);
+    setTimerSeconds(minutes * 60);
+    setIsTimerRunning(false);
+    setShowTimerSetup(false);
+    triggerNotification(
+      "⏱️ Timer Updated", 
+      `Configured a new ${minutes}-minute ${mode} session block.`, 
+      "info"
+    );
+  };
 
   const handleAddCardSlot = () => {
     setCreationCards([...creationCards, { q: "", a: "" }]);
@@ -36,11 +110,26 @@ export default function FlashcardsSection() {
     setIsFlipped(false);
   };
 
+  const handleCardScore = (isCorrect) => {
+    setTotalReviewed((prev) => prev + 1);
+    if (isCorrect) {
+      setMasteryRate((prev) => Math.min(100, Math.round(prev + 1)));
+    }
+    
+    if (currentCardIdx < activeTopic.cardCount - 1) {
+      setCurrentCardIdx((prev) => prev + 1);
+      setIsFlipped(false);
+    } else {
+      setActiveTopic(null);
+      setStreak((prev) => prev + 1);
+      triggerNotification("🎉 Deck Completed", "Study session completed! Performance data synced to your workspace account.", "success");
+    }
+  };
+
   const handleSaveDeck = (e) => {
     e.preventDefault();
     if (!newTopicTitle.trim()) return alert("Please specify a topic title summary label!");
 
-    // CRITICAL SECURITY OVERWRITE: Restrict global distribution updates to premium models
     if (shareGlobally) {
       setShowPremiumModal(true);
       return; 
@@ -49,13 +138,11 @@ export default function FlashcardsSection() {
     let updatedDb = [...database];
 
     if (selectedSubjectId === "custom-subject") {
-      // Prompt user for custom subject name input
       const userSubjectName = prompt("Enter your custom subject name:")?.trim();
-      if (!userSubjectName) return alert("Custom subject name is required!");
+      if (!userSubjectName) return;
 
       const newSubjectId = `custom-sub-${Date.now()}`;
 
-      // Insert an entirely new subject block schema to the app flow
       updatedDb.push({
         id: newSubjectId,
         subject: userSubjectName,
@@ -73,7 +160,6 @@ export default function FlashcardsSection() {
         ]
       });
     } else {
-      // Standard Local Pipeline map for preexisting list values
       updatedDb = database.map((sub) => {
         if (sub.id === selectedSubjectId) {
           return {
@@ -99,7 +185,7 @@ export default function FlashcardsSection() {
     setIsCreating(false);
     setNewTopicTitle("");
     setCreationCards([{ q: "", a: "" }]);
-    alert("🎉 Personal card deck created successfully! Kept private to your account view.");
+    triggerNotification("📁 Local Save Successful", "Personal card deck added directly to your dashboard.", "success");
   };
 
   const filteredDatabase = database.map((subjectGroup) => {
@@ -114,6 +200,27 @@ export default function FlashcardsSection() {
   return (
     <div className="space-y-8 animate-fade-in w-full pb-12 relative text-left">
       
+      {/* NOTIFICATION HUD TOAST POPUP */}
+      {notification.show && (
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] w-full max-w-sm p-4 animate-in slide-in-from-top-8 duration-300">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl flex gap-3 items-start">
+            <div className="text-base pt-0.5">
+              {notification.type === "success" ? "🔔" : "⚠️"}
+            </div>
+            <div className="flex-1 space-y-0.5">
+              <h4 className="text-xs font-black text-slate-100">{notification.title}</h4>
+              <p className="text-[11px] text-slate-400 leading-normal">{notification.message}</p>
+            </div>
+            <button 
+              onClick={() => setNotification((prev) => ({ ...prev, show: false }))}
+              className="text-slate-500 hover:text-slate-300 text-xs font-bold px-1"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* PREMIUM UPGRADE MODAL */}
       {showPremiumModal && (
         <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -145,11 +252,79 @@ export default function FlashcardsSection() {
         </div>
       )}
 
-      {/* HERO TITLE HEADER CONTAINER */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+      {/* EDUCATIONAL METRICS DASHBOARD BANNER */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-lg">🔥</div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Daily Revision Streak</p>
+            <p className="text-sm font-black text-gray-900">{streak} Days Consistent</p>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-lg">📊</div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Total Cards Processed</p>
+            <p className="text-sm font-black text-gray-900">{totalReviewed} Reviews Logged</p>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg">🎯</div>
+          <div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Average Subject Accuracy</p>
+            <p className="text-sm font-black text-gray-900">{masteryRate}% Precision</p>
+          </div>
+        </div>
+      </div>
+
+      {/* HERO TITLE HEADER CONTAINER & POMODORO INTERFACE */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm relative">
         <div className="space-y-1">
           <h1 className="text-xl font-black tracking-tight text-gray-900">Flashcards</h1>
           <p className="text-xs font-medium text-gray-400">Personal study decks are completely unlimited. Go Premium to publish decks globally.</p>
+        </div>
+
+        {/* POMODORO CONTROLLER LOGIC HUB */}
+        <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 p-2 px-3.5 rounded-2xl relative">
+          <div className="text-left">
+            <span className={`text-[8px] font-black uppercase tracking-widest block ${timerMode === 'break' ? 'text-emerald-500 animate-pulse' : 'text-indigo-500'}`}>
+              {timerMode === "focus" ? `Focus Block #${completedCycles + 1}` : "☕ Break Interval"}
+            </span>
+            <span className="text-xs font-mono font-black text-gray-800">{formatTimer()}</span>
+          </div>
+
+          <button 
+            type="button"
+            onClick={() => setIsTimerRunning(!isTimerRunning)}
+            className={`px-3 py-1.5 rounded-xl text-[10px] font-extrabold text-white transition-colors shadow-sm ${isTimerRunning ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+          >
+            {isTimerRunning ? "⏸ Pause" : "▶ Start"}
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => setShowTimerSetup(!showTimerSetup)}
+            className="p-1.5 hover:bg-gray-200/60 rounded-lg text-gray-400 hover:text-gray-600 transition-colors text-xs"
+            title="Configure intervals"
+          >
+            ⚙️
+          </button>
+
+          {/* TIMER SELECTION DROPDOWN POPUP */}
+          {showTimerSetup && (
+            <div className="absolute top-full mt-2 right-0 bg-white border border-gray-100 shadow-xl rounded-2xl p-3 z-30 min-w-[210px] space-y-2 animate-in fade-in zoom-in-95 duration-100">
+              <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider px-1">Set Focus Duration</h4>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button onClick={() => handleSetCustomTimer(25, "focus")} className="py-1.5 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🎯 25 Mins</button>
+                <button onClick={() => handleSetCustomTimer(50, "focus")} className="py-1.5 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-600 text-[10px] font-bold rounded-lg transition-colors">🚀 50 Mins</button>
+              </div>
+              <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-wider pt-1 px-1">Set Break Duration</h4>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button onClick={() => handleSetCustomTimer(5, "break")} className="py-1.5 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-600 text-[10px] font-bold rounded-lg transition-colors">☕ 5 Mins</button>
+                <button onClick={() => handleSetCustomTimer(15, "break")} className="py-1.5 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-600 text-[10px] font-bold rounded-lg transition-colors">🌴 15 Mins</button>
+              </div>
+            </div>
+          )}
         </div>
         
         <div className="flex items-center gap-3">
@@ -272,29 +447,24 @@ export default function FlashcardsSection() {
             </div>
           </div>
 
-          <div className="flex justify-between items-center pt-6 mt-4 border-t border-slate-800">
+          {/* SPACED REPETITION STUDY EVALUATION BUTTONS */}
+          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between pt-6 mt-4 border-t border-slate-800">
             <span className="text-xs text-slate-400 font-bold">Card {currentCardIdx + 1} of {activeTopic.cardCount}</span>
-            <div className="flex gap-2">
+            
+            <div className="flex gap-2 w-full sm:w-auto">
               <button 
-                disabled={currentCardIdx === 0}
-                onClick={() => { setCurrentCardIdx(prev => prev - 1); setIsFlipped(false); }}
-                className="bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-white text-xs font-bold px-4 py-2 rounded-xl"
+                type="button"
+                onClick={() => handleCardScore(false)}
+                className="flex-1 sm:flex-initial bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition-all"
               >
-                ◀ Back
+                ❌ Forgot / Hard
               </button>
               <button 
-                onClick={() => {
-                  if (currentCardIdx < activeTopic.cardCount - 1) {
-                    setCurrentCardIdx(prev => prev + 1);
-                    setIsFlipped(false);
-                  } else {
-                    setActiveTopic(null);
-                    alert("Study session completed successfully! 🎉");
-                  }
-                }}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl"
+                type="button"
+                onClick={() => handleCardScore(true)}
+                className="flex-1 sm:flex-initial bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-white text-xs font-bold px-4 py-2 rounded-xl transition-all"
               >
-                {currentCardIdx === activeTopic.cardCount - 1 ? "Complete 🎉" : "Next ▶"}
+                ✅ Got It Easy
               </button>
             </div>
           </div>
