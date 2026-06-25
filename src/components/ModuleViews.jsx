@@ -143,70 +143,71 @@ export function AiTutorView() {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content:
-        "Hello! I am your StudyNiq AI Tutor. Ask me anything about your subjects and I'll help explain it."
+      content: "Hello! I am your StudyNiq AI Tutor. Ask me anything about your subjects and I'll help explain it."
     }
   ]);
   const [loading, setLoading] = useState(false);
+
+  // Safely capture the API key with a fallback string to prevent production bundle errors
+  const apiKey = import.meta.env.VITE_GROQ_API_KEY || "";
 
   const sendMessage = async () => {
     if (!question.trim()) return;
 
     const userMessage = {
       role: "user",
-      content: question
+      content: question.trim()
     };
 
+    // Append the user message to history, clear input, set loading animation
     setMessages((prev) => [...prev, userMessage]);
     setQuestion("");
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are StudyNiq AI Tutor. Explain concepts clearly for secondary school and GCSE students."
-              },
-              ...messages,
-              userMessage
-            ]
-          })
-        }
-      );
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: "You are StudyNiq AI Tutor. Explain concepts clearly for secondary school and GCSE students."
+            },
+            ...messages,
+            userMessage
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error status: ${response.status}`);
+      }
 
       const data = await response.json();
-
+      
       const aiReply = {
         role: "assistant",
-        content:
-          data?.choices?.[0]?.message?.content ||
-          "Sorry, I couldn't generate a response."
+        content: data?.choices?.[0]?.message?.content || "Sorry, I couldn't generate a response."
       };
 
       setMessages((prev) => [...prev, aiReply]);
     } catch (error) {
+      console.error("Groq API Connection Error:", error);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content:
-            "Error connecting to Groq. Check your API key and internet connection."
+          content: "Error connecting to Groq. Check your API key and internet connection."
         }
       ]);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -219,23 +220,21 @@ export function AiTutorView() {
       </div>
 
       <div className="bg-white border border-gray-100 rounded-3xl flex-1 p-6 shadow-sm flex flex-col overflow-hidden">
+        {/* Messages Feed Box */}
         <div className="space-y-4 overflow-y-auto flex-1 pr-1 pb-4">
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`flex gap-3 ${
-                msg.role === "user" ? "justify-end" : ""
-              }`}
+              className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}
             >
               {msg.role === "assistant" && (
                 <div className="w-7 h-7 bg-indigo-100 text-indigo-600 text-xs rounded-xl flex items-center justify-center font-bold shrink-0">
                   🤖
                 </div>
               )}
-
+              
               <div
-                className={`p-3 rounded-2xl text-xs font-medium leading-relaxed max-w-[80%]
-                ${
+                className={`p-3 rounded-2xl text-xs font-medium leading-relaxed max-w-[80%] ${
                   msg.role === "user"
                     ? "bg-indigo-600 text-white"
                     : "bg-gray-50 border border-gray-100 text-gray-700"
@@ -245,26 +244,29 @@ export function AiTutorView() {
               </div>
             </div>
           ))}
-
+          
           {loading && (
-            <div className="text-xs text-gray-400">
-              AI is thinking...
+            <div className="text-xs text-gray-400 flex items-center gap-2 italic">
+              <span className="animate-pulse">● ● ●</span> AI is thinking...
             </div>
           )}
         </div>
 
+        {/* Input Interactive Box Row */}
         <div className="flex gap-2 pt-4 border-t border-gray-50">
           <input
+            type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder="Ask a question..."
-            className="flex-1 p-3 text-xs bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:border-indigo-500 font-medium"
-          />
-
-          <button
-            onClick={sendMessage}
             disabled={loading}
+            className="flex-1 p-3 text-xs bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:border-indigo-500 font-medium disabled:opacity-60"
+          />
+          <button
+            type="button"
+            onClick={sendMessage}
+            disabled={loading || !question.trim()}
             className="bg-indigo-600 text-white px-4 text-xs font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
           >
             Send
@@ -275,7 +277,7 @@ export function AiTutorView() {
   );
 }
 
-// 📝 NOTES VIEW
+// 📝 NOTES VIEW PLACEHOLDER SECTION (Matching your final screen capture blueprint layout)
 export function NotesView() {
   return (
     <div className="space-y-6">
@@ -285,16 +287,17 @@ export function NotesView() {
           <p className="text-xs text-gray-400 mt-1">Organize and compose summaries of class lecture details.</p>
         </div>
         <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm">
-          ➕ New Document
+          + New Document
         </button>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm cursor-pointer hover:border-gray-200 transition-all flex justify-between items-center">
           <div>
             <h4 className="font-bold text-xs text-gray-900">🧬 Mitosis Structural Breakdown</h4>
             <p className="text-[10px] text-gray-400 mt-1">Updated 2 hours ago</p>
           </div>
-          <span className="text-xs">📄</span>
+          <span className="text-xs">📝</span>
         </div>
       </div>
     </div>
