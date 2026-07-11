@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --target esnext",
+    "build": "vite build --no-external",
     "lint": "eslint .",
     "preview": "vite preview"
   },
